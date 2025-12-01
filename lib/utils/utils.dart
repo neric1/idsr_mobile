@@ -1,0 +1,83 @@
+import 'package:collection/collection.dart';
+import 'package:idsr/data/entity/models/tracked_entity.dart';
+
+Map<String, dynamic> countByGrades(
+    List<TrackedEntity>? statsData,
+    String desiredValue, {
+      String dataElement = "LqnH4F5WpTi",
+    }) {
+  // Result containers
+  final Set<String> countedEventsSet = {};
+  final Map<String, String> ungradedEventsMap = {};
+
+  if (statsData == null || statsData is! List) {
+    print("Invalid or empty statsData");
+    return {
+      "totalCount": 0,
+      "events": [],
+    };
+  }
+
+  for (var instance in statsData) {
+    final enrollments = instance.enrollments;
+    if (enrollments is List && enrollments.isNotEmpty) {
+      final latestEnrollment = enrollments.last;
+
+      final orgUnit = latestEnrollment.orgUnit;
+      final orgUnitName = latestEnrollment.orgUnitName;
+
+      final events = latestEnrollment.events;
+      if (events is List) {
+        for (var event in events) {
+          final dataValues = event.dataValues;
+          if (dataValues is! List) continue;
+
+          // Find grade value
+
+          DataValue? gradeValue = dataValues.firstWhereOrNull(
+                (dv) => dv.dataElement == dataElement,
+          );
+
+
+          // Find "Event name" attribute
+          final attributes = instance.attributes;
+
+
+
+          TeiAttribute?   eventNameAttribute = attributes.firstWhereOrNull(
+                  (attr) => attr.displayName == "Event name",
+              // orElse: () => null,
+            );
+
+
+          final eventName = eventNameAttribute?.value;
+          final grade = gradeValue?.value;
+
+          if (eventName != null && grade == desiredValue) {
+            final eventKey = eventName;
+            final eventCountryKey = "${eventName}_$orgUnit";
+
+            if (desiredValue == "Ungraded") {
+              if (!ungradedEventsMap.containsKey(eventCountryKey)) {
+                final formattedEvent = "$eventName ($orgUnitName)";
+                ungradedEventsMap[eventCountryKey] = formattedEvent;
+              }
+            } else {
+              countedEventsSet.add(eventKey);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Convert to list based on desiredValue
+  final countedEvents = desiredValue == "Ungraded"
+      ? ungradedEventsMap.values.toList()
+      : countedEventsSet.toList();
+
+  return {
+    "totalCount": countedEvents.length,
+    "events": countedEvents,
+  };
+}
