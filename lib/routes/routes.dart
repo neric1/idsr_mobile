@@ -1,6 +1,7 @@
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:idsr/presentation/grade_details.dart';
 import 'package:idsr/presentation/home_page.dart';
 import 'package:idsr/presentation/splash_screen.dart';
 import 'package:idsr/presentation/who_afro_dashboard.dart';
@@ -23,5 +24,15 @@ class Routes {
 
         return  WhoAfrDashboard();}
         ),
+        GoRoute(
+            name: GRADE_DETAILS,
+            path: GRADE_DETAILS,
 
+            builder: (context, state) {
+              final grades = (state.extra
+              as Map<String, dynamic>?)?["grade_list"];
+              final title = (state.extra
+              as Map<String, dynamic>?)?["grade_name"];
+              return  GradeDetails(grades: grades,title: title,);}
+        ),
   ]);}

@@ -2,7 +2,10 @@ import 'package:country_flags/country_flags.dart';
 import 'package:flutter/material.dart';
 
 class GradeDetails extends StatelessWidget {
-  const GradeDetails({super.key});
+
+  final String title;
+  final Map<String, dynamic> grades;
+  const GradeDetails({super.key,required this.title,required this.grades});
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +18,7 @@ class GradeDetails extends StatelessWidget {
         ),
         title:  Center(
           child: Text(
-            "Recent Events",
+            title,
             style: const TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.w700,
@@ -25,52 +28,30 @@ class GradeDetails extends StatelessWidget {
       )
       ,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+        child: ListView.builder(
+          itemCount: grades["events"].length,
+          itemBuilder: (context, index) {
 
-              const SizedBox(height: 20),
-
-              Event(
-                disease: "Mpox",
-                country: "Tanzania",
-                countryCode: "TZ",
-                description:
-                "On 10 March 2025, the Ministry of Health of Tanzania notified WHO of two laboratory-confirmed cases...",
-              ),
-
-              Event(
-                disease: "Cholera",
-                country: "Namibia",
-                countryCode: "NA",
-                description:
-                "On 11 March 2025, Namibia's Ministry of Health declared a cholera outbreak after laboratory confirmation...",
-              ),
-
-              Event(
-                disease: "Mpox",
-                country: "South Africa",
-                countryCode: "ZA",
-                description:
-                "On 24 February 2025, the Government of South Africa notified WHO of a new cluster...",
-              ),
-
-              Event(
-                disease: "Cholera",
-                country: "Kenya",
-                countryCode:"KE",
-                description:
-                "There is an ongoing cholera outbreak in Kenya affecting Migori county since 10 February 2025...",
-              ),
-
-              // etc...
-            ],
-          ),
+            return Event(disease: "${grades["events"][index]}",
+              country: "",
+              countryCode: "",
+              description:
+              "On 11 March 2025, Namibia's Ministry of Health declared a cholera outbreak after laboratory confirmation...",
+            );
+            //   ListTile(
+            //   leading: CircleAvatar(child: Text('${index + 1}')),
+            //   title: Text("${grades["events"][index]}"),
+            //   subtitle: Text('Subtitle for '),
+            //   trailing: Icon(Icons.arrow_forward_ios),
+            //   onTap: () {
+            //     print('Tapped on');
+            //   },
+            // );
+          },
         ),
       ),
-    );
+      );
+
   }
 }
 
@@ -111,7 +92,7 @@ class Event extends StatelessWidget {
               height: 20,
               width: 28,
               child: CountryFlag.fromCountryCode(
-                countryCode,
+                "RW",
                 // width: 28,
                 // height: 20,
               ),

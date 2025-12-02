@@ -54,7 +54,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
 
                   Text(
-                    "IDSR",
+                    "SEMS",
                     style: TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.w700,

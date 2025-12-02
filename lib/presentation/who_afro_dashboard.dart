@@ -1,11 +1,13 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:idsr/application/entity/entity_bloc.dart';
 import 'package:idsr/data/entity/models/tracked_entity.dart';
 import 'package:idsr/presentation/chart.dart';
 import 'package:idsr/presentation/grade_details.dart';
 import 'package:idsr/presentation/map.dart';
+import 'package:idsr/routes/routes_name.dart';
 import 'package:idsr/utils/utils.dart';
 
 class WhoAfrDashboard extends StatelessWidget {
@@ -14,7 +16,7 @@ class WhoAfrDashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F4F4),
+      backgroundColor: const Color(0xFFececec),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -42,33 +44,43 @@ class WhoAfrDashboard extends StatelessWidget {
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
                         "Quick stats",
-                        style: TextStyle(fontSize: 18,fontWeight: FontWeight.w700),
+                        style: TextStyle(fontSize: 18,fontWeight: FontWeight.w700,color: Colors.black),
                       ),
                     ),
                     _buildQuickStats(),
-                    const SizedBox(height: 14),
-                    Row(
-                      children: [
-                        gradeCard(context,grade3["totalCount"].toString(),"Grade 3",const Color(0xFFFF2E2E)),
-                        gradeCard(context,grade2["totalCount"].toString(),"Grade 2",const Color(0xFFFF7A7A)),
-                        gradeCard(context,grade1["totalCount"].toString(),"Grade 1",const Color(0xFFFFD6D6)),
-                        gradeCard(context,ungraded["totalCount"].toString(),"UnGraded",const Color(0xFF4A4F58),txtColor: Colors.white)
-                      ],
+                    // const SizedBox(height: 8),
+                    Container(
+                      padding: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        // color: Color(0xFF28283a),
+                        borderRadius: BorderRadius.circular(5),),
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              gradeCard(context,grade3,"Grade 3",const Color(0xFFFF2E2E)),
+                              gradeCard(context,grade2,"Grade 2",const Color(0xFFFF7A7A)),
+                              gradeCard(context,grade1,"Grade 1",const Color(0xFFFFD6D6)),
+                              gradeCard(context,ungraded,"UnGraded",const Color(0xFF4A4F58),txtColor: Colors.white)
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              gradeCard(context,p3,"Protracted 3",const Color(0xFFE78A52)),
+                              gradeCard(context,p2,"Protracted 2",const  Color(0xFFF3C3A3)),
+                              gradeCard(context,p1,"Protracted 1",const Color(0xFFF7E9D4)),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                    Row(
-                      children: [
-                        gradeCard(context,p3["totalCount"].toString(),"Protracted 3",const Color(0xFFE78A52)),
-                        gradeCard(context,p2["totalCount"].toString(),"Protracted 2",const  Color(0xFFF3C3A3)),
-                        gradeCard(context,p1["totalCount"].toString(),"Protracted 1",const Color(0xFFF7E9D4)),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
+
+                    const SizedBox(height: 8),
                     SizedBox(
                       height: 400,
                       child: MyMapWidget(),
                     ),
                     SizedBox(height: 20,),
-                    const SizedBox(height: 24),
                     _buildPriorityAndTrends(),
                     const SizedBox(height: 90),
                   ],
@@ -91,23 +103,23 @@ class WhoAfrDashboard extends StatelessWidget {
           children: [
             Text(
               "WHO AFRO",
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold,color: Colors.black),
             ),
             Text(
               "IDSR Event Tracker",
-              style: TextStyle(fontSize: 14),
+              style: TextStyle(fontSize: 14,color: Colors.black),
             )
           ],
         ),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           decoration: BoxDecoration(
-            color: Colors.grey.shade300,
+            color: Color(0xFF28283a),
             borderRadius: BorderRadius.circular(14),
           ),
           child: const Text(
             "Epi Week 47, 2025",
-            style: TextStyle(fontWeight: FontWeight.w600),
+            style: TextStyle(fontWeight: FontWeight.w600,color: Colors.white),
           ),
         ),
         // const CircleAvatar(radius: 20, backgroundColor: Colors.grey)
@@ -116,24 +128,30 @@ class WhoAfrDashboard extends StatelessWidget {
   }
 
   Widget _buildQuickStats() {
-    return Builder(
-      builder: (context) {
-        final trackedEntity=context.read<EntityBloc>().trackedEntity;
-        final ongoing= getOngoing(trackedEntity);
-        final data=getHumanitarianOrOutBreak(ongoing);
-        return SizedBox(
-          height: 70, // fixed height
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _statCard("New Events", "0", [Color(0xFFdb711a),Color(0xFFfd8601)]),
-              _statCard("Ongoing ", ongoing.length.toString(), [Color(0xFFbe474c),Color(0xFFfe4740)]),
-              _statCard("Outbreaks", data[0].length.toString(), [Color(0xFF7352b2),Color(0xFF965ff7)]),
-              _statCard("Humanitarian",data[1].length.toString(), [Color(0xFF03784c),Color(0xFF029342)]),
-            ],
-          ),
-        );
-      }
+    return Container(
+      padding: EdgeInsets.all(8),
+    decoration: BoxDecoration(
+      // color: Color(0xFF28283a),
+    borderRadius: BorderRadius.circular(5),),
+      child: Builder(
+        builder: (context) {
+          final trackedEntity=context.read<EntityBloc>().trackedEntity;
+          final ongoing= getOngoing(trackedEntity);
+          final data=getHumanitarianOrOutBreak(ongoing);
+          return SizedBox(
+            height: 70, // fixed height
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _statCard("New Events", "0", [Color(0xFFdb711a),Color(0xFFfd8601)]),
+                _statCard("Ongoing ", ongoing.length.toString(), [Color(0xFFbe474c),Color(0xFFfe4740)]),
+                _statCard("Outbreaks", data[0].length.toString(), [Color(0xFF7352b2),Color(0xFF965ff7)]),
+                _statCard("Humanitarian",data[1].length.toString(), [Color(0xFF03784c),Color(0xFF029342)]),
+              ],
+            ),
+          );
+        }
+      ),
     );
   }
 
@@ -169,7 +187,7 @@ class WhoAfrDashboard extends StatelessWidget {
 
   Widget gradeCard(
       BuildContext context,
-      String count,
+      Map<String, dynamic> grades,
       String title,
       Color color, {
         Color txtColor = const Color(0xFF000000),
@@ -177,10 +195,15 @@ class WhoAfrDashboard extends StatelessWidget {
     return Expanded(
       child: GestureDetector(
         onTap: (){
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => GradeDetails()),
-          );
+          context.pushNamed(GRADE_DETAILS,
+          extra: {
+            "grade_name":title,
+            "grade_list": grades
+          });
+          // Navigator.push(
+          //   context,
+          //   MaterialPageRoute(builder: (context) => GradeDetails()),
+          // );
         },
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 10),
@@ -225,7 +248,7 @@ class WhoAfrDashboard extends StatelessWidget {
                         child: FittedBox(
                           fit: BoxFit.scaleDown,
                           child: Text(
-                            count,
+                            grades["totalCount"].toString(),
                             style: TextStyle(
                               color: Colors.black,
                               fontSize: 11,
@@ -270,7 +293,7 @@ class WhoAfrDashboard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: const [
-          Text("Priority Events", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16,color: Colors.white)),
+          Text("Recent Events", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16,color: Colors.white)),
           SizedBox(height: 10),
           Column(
               crossAxisAlignment: CrossAxisAlignment.start,
