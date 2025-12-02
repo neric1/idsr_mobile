@@ -1,6 +1,14 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:idsr/application/entity/entity_bloc.dart';
+import 'package:idsr/data/entity/models/tracked_entity.dart';
 import 'package:idsr/presentation/chart.dart';
+import 'package:idsr/presentation/grade_details.dart';
 import 'package:idsr/presentation/map.dart';
+import 'package:idsr/routes/routes_name.dart';
+import 'package:idsr/utils/utils.dart';
 
 class WhoAfrDashboard extends StatelessWidget {
   const WhoAfrDashboard({super.key});
@@ -8,35 +16,76 @@ class WhoAfrDashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F4F4),
+      backgroundColor: const Color(0xFFececec),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildHeader(),
-                const SizedBox(height: 14),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    "Quick stats",
-                    style: TextStyle(fontSize: 18,fontWeight: FontWeight.w700),
-                  ),
-                ),
-                _buildQuickStats(),
-                const SizedBox(height: 24),
-                const SizedBox(height: 16),
-                SizedBox(
-                  height: 400,
-                  child: MyMapWidget(),
-                ),
-                SizedBox(height: 20,),
-                const SizedBox(height: 24),
-                _buildPriorityAndTrends(),
-                const SizedBox(height: 90),
-              ],
+            child: Builder(
+              builder: (context) {
+
+                final trackedEntity=context.read<EntityBloc>().trackedEntity;
+                final ongoing= getOngoing(trackedEntity);
+               final grade3= countByGrades(ongoing,"Grade 3",dataElement: "swCuEaReUQr");
+                final grade2= countByGrades(ongoing,"Grade 2",dataElement: "swCuEaReUQr");
+                final grade1= countByGrades(ongoing,"Grade 1",dataElement: "swCuEaReUQr");
+                final ungraded= countByGrades(ongoing,"Ungraded",dataElement: "swCuEaReUQr");
+
+                final p3= countByGrades(ongoing,"Protracted3",dataElement: "swCuEaReUQr");
+                final p2= countByGrades(ongoing,"Protracted2",dataElement: "swCuEaReUQr");
+                final p1= countByGrades(ongoing,"Protracted1",dataElement: "swCuEaReUQr");
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildHeader(),
+                    const SizedBox(height: 14),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        "Quick stats",
+                        style: TextStyle(fontSize: 18,fontWeight: FontWeight.w700,color: Colors.black),
+                      ),
+                    ),
+                    _buildQuickStats(),
+                    // const SizedBox(height: 8),
+                    Container(
+                      padding: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        // color: Color(0xFF28283a),
+                        borderRadius: BorderRadius.circular(5),),
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              gradeCard(context,grade3,"Grade 3",const Color(0xFFFF2E2E)),
+                              gradeCard(context,grade2,"Grade 2",const Color(0xFFFF7A7A)),
+                              gradeCard(context,grade1,"Grade 1",const Color(0xFFFFD6D6)),
+                              gradeCard(context,ungraded,"UnGraded",const Color(0xFF4A4F58),txtColor: Colors.white)
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              gradeCard(context,p3,"Protracted 3",const Color(0xFFE78A52)),
+                              gradeCard(context,p2,"Protracted 2",const  Color(0xFFF3C3A3)),
+                              gradeCard(context,p1,"Protracted 1",const Color(0xFFF7E9D4)),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 8),
+                    SizedBox(
+                      height: 400,
+                      child: MyMapWidget(),
+                    ),
+                    SizedBox(height: 20,),
+                    _buildPriorityAndTrends(),
+                    const SizedBox(height: 90),
+                  ],
+                );
+              }
             ),
           ),
         ),
@@ -54,23 +103,23 @@ class WhoAfrDashboard extends StatelessWidget {
           children: [
             Text(
               "WHO AFRO",
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold,color: Colors.black),
             ),
             Text(
               "IDSR Event Tracker",
-              style: TextStyle(fontSize: 14),
+              style: TextStyle(fontSize: 14,color: Colors.black),
             )
           ],
         ),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           decoration: BoxDecoration(
-            color: Colors.grey.shade300,
+            color: Color(0xFF28283a),
             borderRadius: BorderRadius.circular(14),
           ),
           child: const Text(
             "Epi Week 47, 2025",
-            style: TextStyle(fontWeight: FontWeight.w600),
+            style: TextStyle(fontWeight: FontWeight.w600,color: Colors.white),
           ),
         ),
         // const CircleAvatar(radius: 20, backgroundColor: Colors.grey)
@@ -79,20 +128,34 @@ class WhoAfrDashboard extends StatelessWidget {
   }
 
   Widget _buildQuickStats() {
-    return IntrinsicHeight(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          _statCard("New Events", ["Grade 3", "Grade 2"], [Color(0xFFdb711a),Color(0xFFfd8601)]),
-          _statCard("Ongoing Outbreaks", ["Grade 1"], [Color(0xFFbe474c),Color(0xFFfe4740)]),
-          _statCard("Humanitarian Events", ["Protracted 3", "Protracted 2"], [Color(0xFF7352b2),Color(0xFF965ff7)]),
-          _statCard("Controlled Events", ["Protracted 1"], [Color(0xFF03784c),Color(0xFF029342)]),
-        ],
+    return Container(
+      padding: EdgeInsets.all(8),
+    decoration: BoxDecoration(
+      // color: Color(0xFF28283a),
+    borderRadius: BorderRadius.circular(5),),
+      child: Builder(
+        builder: (context) {
+          final trackedEntity=context.read<EntityBloc>().trackedEntity;
+          final ongoing= getOngoing(trackedEntity);
+          final data=getHumanitarianOrOutBreak(ongoing);
+          return SizedBox(
+            height: 70, // fixed height
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _statCard("New Events", "0", [Color(0xFFdb711a),Color(0xFFfd8601)]),
+                _statCard("Ongoing ", ongoing.length.toString(), [Color(0xFFbe474c),Color(0xFFfe4740)]),
+                _statCard("Outbreaks", data[0].length.toString(), [Color(0xFF7352b2),Color(0xFF965ff7)]),
+                _statCard("Humanitarian",data[1].length.toString(), [Color(0xFF03784c),Color(0xFF029342)]),
+              ],
+            ),
+          );
+        }
       ),
     );
   }
 
-  Widget _statCard(String title, List<String> levels, List<Color> color) {
+  Widget _statCard(String title, String levels, List<Color> color) {
     return Expanded(
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 4),
@@ -106,80 +169,116 @@ class WhoAfrDashboard extends StatelessWidget {
           ),
         ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text(
+            AutoSizeText(
               title,
+              maxLines: 1,
               style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
             ),
             const SizedBox(height: 10),
-            for (final l in levels)
-              Padding(
-                padding: const EdgeInsets.all(2.0),
-                child: Container(
-                  padding: const EdgeInsets.all(2.0),
-                    decoration: BoxDecoration(
-                      color: Colors.grey,
-                      borderRadius: BorderRadius.circular(5),
+            Text(levels, style: const TextStyle(color: Colors.white, fontSize: 20,fontWeight: FontWeight.bold),textAlign: TextAlign.center,),
 
-                    ),
-                    child: Text(l, style: const TextStyle(color: Colors.white, fontSize: 11))),
-              )
           ],
         ),
       ),
     );
   }
 
-  Widget _buildMapSection() {
-    return Container(
-      height: 260,
-      decoration: BoxDecoration(
-        color: Colors.black,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Stack(
-        children: [
-          Positioned.fill(
-            child: Image.network(
-              "https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Africa_satellite_orthographic.jpg/640px-Africa_satellite_orthographic.jpg",
-              fit: BoxFit.cover,
-              opacity: const AlwaysStoppedAnimation(0.5),
-            ),
+  Widget gradeCard(
+      BuildContext context,
+      Map<String, dynamic> grades,
+      String title,
+      Color color, {
+        Color txtColor = const Color(0xFF000000),
+      }) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: (){
+          context.pushNamed(GRADE_DETAILS,
+          extra: {
+            "grade_name":title,
+            "grade_list": grades
+          });
+          // Navigator.push(
+          //   context,
+          //   MaterialPageRoute(builder: (context) => GradeDetails()),
+          // );
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 10),
+          child: Stack(
+            clipBehavior: Clip.none, // allow overflow
+            children: [
+              // Main card
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.only(left: 5,top: 2,bottom: 2),
+                decoration: BoxDecoration(
+                  color: color,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    color: txtColor,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+
+              // Badge at center-right
+              Positioned(
+                right: -12,
+                top: 0,
+                bottom: 0,
+                child: Center(
+                  child: FractionallySizedBox(
+                    heightFactor: 1.5, // 80% of the card height
+                    child: AspectRatio(
+                      aspectRatio: 1, // keeps it square
+                      child: Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white,
+                          border: Border.all(color: color, width: 2),
+                        ),
+                        alignment: Alignment.center,
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            grades["totalCount"].toString(),
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                              height: 1.0,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+            ],
           ),
-          Positioned(
-            top: 10,
-            left: 10,
-            child: _mapButton(Icons.settings),
-          ),
-          Positioned(
-            top: 10,
-            right: 10,
-            child: _mapButton(Icons.add),
-          ),
-        ],
+        ),
       ),
     );
   }
 
-  Widget _mapButton(IconData icon) {
-    return Container(
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Icon(icon, size: 20),
-    );
-  }
+
 
   Widget _buildPriorityAndTrends() {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(child: _priorityCard()),
-        const SizedBox(width: 10),
-        Expanded(child: _trendsCard()),
+        // const SizedBox(width: 10),
+        // Expanded(child: _trendsCard()),
       ],
     );
   }
@@ -194,7 +293,7 @@ class WhoAfrDashboard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: const [
-          Text("Priority Events", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16,color: Colors.white)),
+          Text("Recent Events", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16,color: Colors.white)),
           SizedBox(height: 10),
           Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -246,15 +345,86 @@ class WhoAfrDashboard extends StatelessWidget {
     );
   }
 
-  Widget _buildBottomNav() {
-    return BottomNavigationBar(
-      currentIndex: 0,
-      items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.home), label: ""),
-        BottomNavigationBarItem(icon: Icon(Icons.search), label: ""),
-        BottomNavigationBarItem(icon: Icon(Icons.notifications), label: ""),
-        BottomNavigationBarItem(icon: Icon(Icons.person), label: ""),
-      ],
+
+}
+List<List<TrackedEntity>> getHumanitarianOrOutBreak(List<TrackedEntity> ongoing,{String v="humanitarian"}) {
+  final List<TrackedEntity> HTEvents = [];
+  final List<TrackedEntity> OBEvents = [];
+  final List<TrackedEntity> unknown = [];
+  for (final enrollment in ongoing) {
+
+
+
+
+    final isHT =enrollment.attributes.any(
+          (dv) =>
+      dv.attribute == "jLHBfRluNTt" &&
+          dv.value.toLowerCase() == "humanitarian",
     );
+
+    final isOB =enrollment.attributes.any(
+          (dv) =>
+      dv.attribute == "jLHBfRluNTt" &&
+          dv.value.toLowerCase() == "outbreak",
+    );
+
+    if (isHT) {
+      HTEvents.add(enrollment);
+    }
+    else if (isOB) {
+      OBEvents.add(enrollment);
+    }else{
+      // final attr=enrollment.attributes;
+      // for (final enr in attr) {
+      //   print(enrollment.enrollments[0].orgUnitName);
+      //   print("objecthhh");
+      //   print(enr.toJson());
+      // }
+      unknown.add(enrollment);
+    }
+
   }
+  return [OBEvents,HTEvents,unknown];
+}
+
+List<TrackedEntity> getOngoing(List<TrackedEntity> trackedEntity) {
+  final List<TrackedEntity> ongoingEvents = [];
+
+  for (final enrollment in trackedEntity) {
+
+    final lastEvent=getLastEvent(enrollment.enrollments[0]);
+
+    if(lastEvent!=null){
+
+      final hasOngoingStatus =lastEvent.dataValues.any(
+            (dv) =>
+        dv.dataElement == "aC8lzAvYHdh" &&
+            dv.value.toLowerCase() == "ongoing",
+      );
+
+      if (hasOngoingStatus) {
+        ongoingEvents.add(enrollment);
+      }
+    }
+  }
+
+  return ongoingEvents;
+}
+
+EventItem? getLastEvent(Enrollment? enrollment) {
+  if (enrollment == null || enrollment.events.isEmpty) {
+    return null;
+  }
+
+  List<EventItem> events = enrollment.events;
+
+  // Sort events by created date
+  events.sort((a, b) {
+    DateTime dateA = DateTime.parse(a.created);
+    DateTime dateB = DateTime.parse(b.created);
+    return dateA.compareTo(dateB);
+  });
+
+  return events.isNotEmpty ? events.last : null;
+
 }

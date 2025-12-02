@@ -285,10 +285,10 @@ class _HomePageState extends State<HomePage> {
   }){
     return   GestureDetector(
       onTap: (){
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => GradeDetails()),
-        );
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute(builder: (context) => GradeDetails()),
+        // );
       },
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 10,vertical: 5),
