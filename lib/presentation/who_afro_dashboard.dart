@@ -38,7 +38,7 @@ class WhoAfrDashboard extends StatelessWidget {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildHeader(),
+                    _buildHeader(context),
                     const SizedBox(height: 14),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
@@ -94,9 +94,10 @@ class WhoAfrDashboard extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -111,17 +112,52 @@ class WhoAfrDashboard extends StatelessWidget {
             )
           ],
         ),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          decoration: BoxDecoration(
-            color: Color(0xFF28283a),
-            borderRadius: BorderRadius.circular(14),
+
+          IconButton(
+            icon: const Icon(Icons.filter_list),
+            onPressed: () {
+              // Example: show a bottom sheet for filters
+              showModalBottomSheet(
+                isScrollControlled: true,
+                context: context,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                ),
+                builder: (context) =>  SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.8,
+                  width: double.infinity,
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          "Filters",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
           ),
-          child: const Text(
-            "Epi Week 47, 2025",
-            style: TextStyle(fontWeight: FontWeight.w600,color: Colors.white),
-          ),
-        ),
+
+        // Container(
+        //   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        //   decoration: BoxDecoration(
+        //     color: Color(0xFF28283a),
+        //     borderRadius: BorderRadius.circular(14),
+        //   ),
+        //   child: const Text(
+        //     "Epi Week 47, 2025",
+        //     style: TextStyle(fontWeight: FontWeight.w600,color: Colors.white),
+        //   ),
+        // ),
         // const CircleAvatar(radius: 20, backgroundColor: Colors.grey)
       ],
     );
@@ -143,10 +179,10 @@ class WhoAfrDashboard extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _statCard("New Events", "0", [Color(0xFFdb711a),Color(0xFFfd8601)]),
-                _statCard("Ongoing ", ongoing.length.toString(), [Color(0xFFbe474c),Color(0xFFfe4740)]),
-                _statCard("Outbreaks", data[0].length.toString(), [Color(0xFF7352b2),Color(0xFF965ff7)]),
-                _statCard("Humanitarian",data[1].length.toString(), [Color(0xFF03784c),Color(0xFF029342)]),
+                _statCard(context,"New Events", [], [Color(0xFFdb711a),Color(0xFFfd8601)]),
+                _statCard(context,"Ongoing ", ongoing, [Color(0xFFbe474c),Color(0xFFfe4740)]),
+                _statCard(context,"Outbreaks", data[0], [Color(0xFF0000cc),Color(0xFF000066)]),
+                _statCard(context,"Humanitarian",data[1], [Color(0xFF330000),Color(0xFF800000)]),
               ],
             ),
           );
@@ -155,31 +191,44 @@ class WhoAfrDashboard extends StatelessWidget {
     );
   }
 
-  Widget _statCard(String title, String levels, List<Color> color) {
+  Widget _statCard(BuildContext context,String title, List<TrackedEntity> levels, List<Color> color) {
     return Expanded(
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 4),
-        padding: const EdgeInsets.all(5),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(5),
-          gradient: LinearGradient(
-            begin: Alignment.bottomCenter,
-              end: Alignment.topCenter,
-            colors: color,
-          ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            AutoSizeText(
-              title,
-              maxLines: 1,
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
+      child: GestureDetector(
+        onTap: (){
+          context.pushNamed(EVENT_DETAILS,
+              extra: {
+                "event_name":title,
+                "event_list": levels
+              });
+          // Navigator.push(
+          //   context,
+          //   MaterialPageRoute(builder: (context) => GradeDetails()),
+          // );
+        },
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 4),
+          padding: const EdgeInsets.all(5),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(5),
+            gradient: LinearGradient(
+              begin: Alignment.bottomCenter,
+                end: Alignment.topCenter,
+              colors: color,
             ),
-            const SizedBox(height: 10),
-            Text(levels, style: const TextStyle(color: Colors.white, fontSize: 20,fontWeight: FontWeight.bold),textAlign: TextAlign.center,),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              AutoSizeText(
+                title,
+                maxLines: 1,
+                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
+              ),
+              const SizedBox(height: 10),
+              Text(levels.length.toString(), style: const TextStyle(color: Colors.white, fontSize: 20,fontWeight: FontWeight.bold),textAlign: TextAlign.center,),
 
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -206,7 +255,7 @@ class WhoAfrDashboard extends StatelessWidget {
           // );
         },
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 7,vertical: 10),
           child: Stack(
             clipBehavior: Clip.none, // allow overflow
             children: [
@@ -399,10 +448,16 @@ List<TrackedEntity> getOngoing(List<TrackedEntity> trackedEntity) {
       final hasOngoingStatus =lastEvent.dataValues.any(
             (dv) =>
         dv.dataElement == "aC8lzAvYHdh" &&
-            dv.value.toLowerCase() == "ongoing",
+            dv.value.toLowerCase() == "ongoing" ,
+      );
+      final isConf =enrollment.attributes.any(
+            (dv) =>
+        dv.attribute == "z1zytGuFhiM" &&
+            dv.value.toLowerCase() == "true",
       );
 
-      if (hasOngoingStatus) {
+      if (hasOngoingStatus && !isConf) {
+
         ongoingEvents.add(enrollment);
       }
     }

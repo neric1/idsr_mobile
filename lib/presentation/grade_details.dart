@@ -1,5 +1,7 @@
+import 'package:collection/collection.dart';
 import 'package:country_flags/country_flags.dart';
 import 'package:flutter/material.dart';
+import 'package:idsr/data/entity/models/tracked_entity.dart';
 
 class GradeDetails extends StatelessWidget {
 
@@ -28,26 +30,40 @@ class GradeDetails extends StatelessWidget {
       )
       ,
       body: SafeArea(
-        child: ListView.builder(
-          itemCount: grades["events"].length,
-          itemBuilder: (context, index) {
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 18.0),
+          child: ListView.builder(
+            itemCount: grades["gradedEntity"].length,
+            itemBuilder: (context, index) {
+              TrackedEntity trackedEntity=grades["gradedEntity"][index];
+              Enrollment enrollment=trackedEntity.enrollments[0];
 
-            return Event(disease: "${grades["events"][index]}",
-              country: "",
-              countryCode: "",
-              description:
-              "On 11 March 2025, Namibia's Ministry of Health declared a cholera outbreak after laboratory confirmation...",
-            );
-            //   ListTile(
-            //   leading: CircleAvatar(child: Text('${index + 1}')),
-            //   title: Text("${grades["events"][index]}"),
-            //   subtitle: Text('Subtitle for '),
-            //   trailing: Icon(Icons.arrow_forward_ios),
-            //   onTap: () {
-            //     print('Tapped on');
-            //   },
-            // );
-          },
+              TeiAttribute?   eventNameAttribute = trackedEntity.attributes.firstWhereOrNull(
+                    (attr) => attr.displayName == "Event name",
+                // orElse: () => null,
+              );
+              TeiAttribute?   eventNoteAttribute = trackedEntity.attributes.firstWhereOrNull(
+                    (attr) => attr.displayName == "Notes",
+                // orElse: () => null,
+              );
+              final eventname=eventNameAttribute?.value;
+              final notes=eventNoteAttribute?.value;
+              return Event(disease:"$eventname" ,
+                country: "${enrollment.orgUnitName}",
+                countryCode: "",
+                description:"$notes"
+              );
+              //   ListTile(
+              //   leading: CircleAvatar(child: Text('${index + 1}')),
+              //   title: Text("${grades["events"][index]}"),
+              //   subtitle: Text('Subtitle for '),
+              //   trailing: Icon(Icons.arrow_forward_ios),
+              //   onTap: () {
+              //     print('Tapped on');
+              //   },
+              // );
+            },
+          ),
         ),
       ),
       );
@@ -88,17 +104,17 @@ class Event extends StatelessWidget {
         // Flag + country name + yellow badge
         Row(
           children: [
-            SizedBox(
-              height: 20,
-              width: 28,
-              child: CountryFlag.fromCountryCode(
-                "RW",
-                // width: 28,
-                // height: 20,
-              ),
-            ),
+            // SizedBox(
+            //   height: 20,
+            //   width: 28,
+            //   child: CountryFlag.fromCountryCode(
+            //     "RW",
+            //     // width: 28,
+            //     // height: 20,
+            //   ),
+            // ),
 
-            const SizedBox(width: 8),
+            // const SizedBox(width: 8),
 
             Text(
               country,
