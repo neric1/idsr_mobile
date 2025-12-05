@@ -135,7 +135,7 @@ class WhoAfrDashboard extends StatelessWidget {
                   borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
                 ),
                 builder: (context) =>  SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.8,
+                  height: MediaQuery.of(context).size.height * 0.9,
                   width: double.infinity,
                   child:SingleChildScrollView(child: FilterScreenUI())
                   // Column(
