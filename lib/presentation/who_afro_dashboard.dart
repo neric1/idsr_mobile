@@ -136,7 +136,7 @@ class WhoAfrDashboard extends StatelessWidget {
                 ),
                 builder: (context) =>  SizedBox(
                   height: MediaQuery.of(context).size.height * 0.9,
-                  width: double.infinity,
+                  width: double.infinity,//
                   child:SingleChildScrollView(child: FilterScreenUI())
                   // Column(
                   //   children: [
