@@ -189,7 +189,7 @@ class WhoAfrDashboard extends StatelessWidget {
           return SizedBox(
             height: 70, // fixed height
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,//mm
               children: [
                 _statCard(context,"New Events", [], [Color(0xFFdb711a),Color(0xFFfd86f2)]),
                 _statCard(context,"Ongoing ", ongoing, [Color(0xFFbe474c),Color(0xFFfe4740)]),
