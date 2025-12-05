@@ -191,7 +191,7 @@ class WhoAfrDashboard extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _statCard(context,"New Events", [], [Color(0xFFdb711a),Color(0xFFfd8601)]),
+                _statCard(context,"New Events", [], [Color(0xFFdb711a),Color(0xFFfd8601)]),//nb
                 _statCard(context,"Ongoing ", ongoing, [Color(0xFFbe474c),Color(0xFFfe4740)]),
                 _statCard(context,"Outbreaks", data[0], [Color(0xFF0000cc),Color(0xFF000066)]),
                 _statCard(context,"Humanitarian",data[1], [Color(0xFF330000),Color(0xFF800000)]),
