@@ -32,6 +32,15 @@ class MyApp extends StatelessWidget {
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
+          appBarTheme: AppBarTheme(
+            backgroundColor: Color(0xFFececec),//Color(0xFF4287f5), // Set global AppBar color
+            foregroundColor: Colors.black, // Text & icon color
+            elevation: 0, // optional
+          ),
+          splashFactory: NoSplash.splashFactory,
+          highlightColor: Colors.transparent,
+          splashColor: Colors.transparent,
+          hoverColor: Colors.transparent,
 
           colorScheme: ColorScheme.fromSeed(seedColor: Color(0xFF1A237E)),
         ),

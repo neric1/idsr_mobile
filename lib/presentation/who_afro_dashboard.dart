@@ -1,6 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:idsr/application/entity/entity_bloc.dart';
 import 'package:idsr/data/entity/models/tracked_entity.dart';
@@ -20,6 +21,46 @@ class WhoAfrDashboard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFececec),
+      appBar: AppBar(
+        elevation: 0,
+        title:
+      _buildHeader(context) ,
+      actions: [      IconButton(
+        icon: const Icon(Icons.filter_list),
+        onPressed: () {
+          // Example: show a bottom sheet for filters
+          showModalBottomSheet(
+            isScrollControlled: true,
+            context: context,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            ),
+            builder: (context) =>  SizedBox(
+                height: MediaQuery.of(context).size.height * 0.9,
+                width: double.infinity,
+                child:SingleChildScrollView(child: FilterScreenUI())
+              // Column(
+              //   children: [
+              //     Padding(
+              //       padding: const EdgeInsets.all(8.0),
+              //       child: Text(
+              //         "Filters",
+              //         style: TextStyle(
+              //           fontSize: 18,
+              //           fontWeight: FontWeight.w600,
+              //           color: Colors.black,
+              //         ),
+              //         textAlign: TextAlign.center,
+              //       ),
+              //     ),
+              //   ],
+              // ),
+            ),
+          );
+        },
+      ),
+      ],
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -41,7 +82,6 @@ class WhoAfrDashboard extends StatelessWidget {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildHeader(context),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
@@ -54,7 +94,7 @@ class WhoAfrDashboard extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
-                        "Quick stats",
+                        "Events",
                         style: TextStyle(fontSize: 18,fontWeight: FontWeight.w700,color: Colors.black),
                       ),
                     ),
@@ -108,68 +148,41 @@ class WhoAfrDashboard extends StatelessWidget {
   Widget _buildHeader(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        const Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "WHO AFRO",
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold,color: Colors.black),
-            ),
-            Text(
-              "IDSR Event Tracker",
-              style: TextStyle(fontSize: 14,color: Colors.black),
-            )
-          ],
+        // const Column(
+        //   crossAxisAlignment: CrossAxisAlignment.start,
+        //   children: [
+        //     Text(
+        //       "WHO AFRO",
+        //       style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold,color: Color(0xFF4287f5)),
+        //     ),
+        //     Text(
+        //       "IDSR Event Tracker",
+        //       style: TextStyle(fontSize: 14,color: Color(0xFF4287f5)),
+        //     )
+        //   ],
+        // ),
+
+        SvgPicture.asset(
+          'assets/logo.svg',
+
+          height: 56,
+          fit: BoxFit.contain,
+          colorFilter: const ColorFilter.mode(Colors.blue, BlendMode.srcIn),
         ),
 
-          IconButton(
-            icon: const Icon(Icons.filter_list),
-            onPressed: () {
-              // Example: show a bottom sheet for filters
-              showModalBottomSheet(
-                isScrollControlled: true,
-                context: context,
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                ),
-                builder: (context) =>  SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.9,
-                  width: double.infinity,
-                  child:SingleChildScrollView(child: FilterScreenUI())
-                  // Column(
-                  //   children: [
-                  //     Padding(
-                  //       padding: const EdgeInsets.all(8.0),
-                  //       child: Text(
-                  //         "Filters",
-                  //         style: TextStyle(
-                  //           fontSize: 18,
-                  //           fontWeight: FontWeight.w600,
-                  //           color: Colors.black,
-                  //         ),
-                  //         textAlign: TextAlign.center,
-                  //       ),
-                  //     ),
-                  //   ],
-                  // ),
-                ),
-              );
-            },
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+          decoration: BoxDecoration(
+            color: Color(0xFF4287f5),
+            borderRadius: BorderRadius.circular(14),
           ),
-
-        // Container(
-        //   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        //   decoration: BoxDecoration(
-        //     color: Color(0xFF28283a),
-        //     borderRadius: BorderRadius.circular(14),
-        //   ),
-        //   child: const Text(
-        //     "Epi Week 47, 2025",
-        //     style: TextStyle(fontWeight: FontWeight.w600,color: Colors.white),
-        //   ),
-        // ),
+          child: const Text(
+            "Epi Week 47, 2025",
+            style: TextStyle(color: Colors.white,fontSize: 15),
+          ),
+        ),
         // const CircleAvatar(radius: 20, backgroundColor: Colors.grey)
       ],
     );
@@ -191,10 +204,10 @@ class WhoAfrDashboard extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _statCard(context,"New Events", [], [Color(0xFFdb711a),Color(0xFFfd8601)]),//nb
-                _statCard(context,"Ongoing ", ongoing, [Color(0xFFbe474c),Color(0xFFfe4740)]),
-                _statCard(context,"Outbreaks", data[0], [Color(0xFF0000cc),Color(0xFF000066)]),
-                _statCard(context,"Humanitarian",data[1], [Color(0xFF330000),Color(0xFF800000)]),
+                _statCard(context,"New Events", [], [Color(0xFF4287f5),Color(0xFF4287f5)]),//nb
+                _statCard(context,"Ongoing ", ongoing, [Color(0xFF4287f5),Color(0xFF4287f5)]),
+                _statCard(context,"Outbreaks", data[0], [Color(0xFF4287f5),Color(0xFF4287f5)]),
+                _statCard(context,"Humanitarian",data[1], [Color(0xFF4287f5),Color(0xFF4287f5)]),
               ],
             ),
           );

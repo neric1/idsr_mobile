@@ -66,7 +66,7 @@ class _InfiniteScrollRowState extends State<InfiniteScrollRow> {
             margin: EdgeInsets.symmetric(horizontal: 8),
             padding: EdgeInsets.symmetric(horizontal: 5),
             decoration: BoxDecoration(
-              color: extendedColors[index],
+              color: Colors.red,
               borderRadius: BorderRadius.circular(16), // rounded corners
             ),
             child: Center(
