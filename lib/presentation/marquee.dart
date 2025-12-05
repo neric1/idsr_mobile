@@ -55,16 +55,16 @@ class _InfiniteScrollRowState extends State<InfiniteScrollRow> {
     final extendedColors = [...colors, ...colors];
 
     return SizedBox(
-      height: 50,
+      height: 20,
       child: ListView.builder(
         controller: _scrollController,
         scrollDirection: Axis.horizontal,
         itemCount: extendedColors.length,
         itemBuilder: (context, index) {
           return Container(
-            width: 200,
+            // width: 200,
             margin: EdgeInsets.symmetric(horizontal: 8),
-            padding: EdgeInsets.all(16),
+            padding: EdgeInsets.symmetric(horizontal: 5),
             decoration: BoxDecoration(
               color: extendedColors[index],
               borderRadius: BorderRadius.circular(16), // rounded corners

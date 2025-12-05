@@ -7,8 +7,11 @@ import 'package:idsr/data/entity/models/tracked_entity.dart';
 import 'package:idsr/presentation/chart.dart';
 import 'package:idsr/presentation/grade_details.dart';
 import 'package:idsr/presentation/map.dart';
+import 'package:idsr/presentation/marquee.dart';
 import 'package:idsr/routes/routes_name.dart';
 import 'package:idsr/utils/utils.dart';
+
+import 'filters.dart';
 
 class WhoAfrDashboard extends StatelessWidget {
   const WhoAfrDashboard({super.key});
@@ -39,7 +42,15 @@ class WhoAfrDashboard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildHeader(context),
-                    const SizedBox(height: 14),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        "Signals",
+                        style: TextStyle(fontSize: 18,fontWeight: FontWeight.w700,color: Colors.black),
+                      ),
+                    ),
+                    InfiniteScrollRow(),
+                    // const SizedBox(height: 14),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
@@ -126,22 +137,23 @@ class WhoAfrDashboard extends StatelessWidget {
                 builder: (context) =>  SizedBox(
                   height: MediaQuery.of(context).size.height * 0.8,
                   width: double.infinity,
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          "Filters",
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ],
-                  ),
+                  child:SingleChildScrollView(child: FilterScreenUI())
+                  // Column(
+                  //   children: [
+                  //     Padding(
+                  //       padding: const EdgeInsets.all(8.0),
+                  //       child: Text(
+                  //         "Filters",
+                  //         style: TextStyle(
+                  //           fontSize: 18,
+                  //           fontWeight: FontWeight.w600,
+                  //           color: Colors.black,
+                  //         ),
+                  //         textAlign: TextAlign.center,
+                  //       ),
+                  //     ),
+                  //   ],
+                  // ),
                 ),
               );
             },
