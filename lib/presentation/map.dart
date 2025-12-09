@@ -13,7 +13,7 @@ class _MyMapWidgetState extends State<MyMapWidget> {
 
   void _zoomIn() {
     final camera = _mapController.camera;
-    final newZoom = (camera.zoom + 1).clamp(0.0, 20.0);
+    final newZoom = (camera.zoom + 0.5).clamp(0.0, 20.0);
 
     _mapController.move(camera.center, newZoom);
 
@@ -22,7 +22,7 @@ class _MyMapWidgetState extends State<MyMapWidget> {
 
   void _zoomOut() {
     final camera = _mapController.camera;
-    final newZoom = (camera.zoom - 1).clamp(0.0, 20.0);
+    final newZoom = (camera.zoom - 0.5).clamp(0.0, 20.0);
 
     _mapController.move(camera.center, newZoom);
   }
@@ -36,7 +36,7 @@ class _MyMapWidgetState extends State<MyMapWidget> {
             mapController: _mapController,
             options: MapOptions(
               initialCenter: LatLng(0, 16),
-              initialZoom: 2.8,
+              initialZoom: 2.5,
               backgroundColor: Colors.black,
     interactionOptions: const InteractionOptions(
     flags: InteractiveFlag.none, // disables drag + everything

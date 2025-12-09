@@ -4,5 +4,5 @@ import 'package:idsr/data/models/success_response.dart';
 abstract class EntityRepository {
   EntityRepository();
 
-  Future<Either<ErrorResponse, SuccessResponse<Map<String,dynamic>>>> getTrackedEntity();
+  Future<Either<ErrorResponse, SuccessResponse<Map<String,dynamic>>>> getTrackedEntity({required String programeId});
 }

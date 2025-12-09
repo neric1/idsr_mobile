@@ -1,16 +1,22 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:idsr/application/entity/entity_bloc.dart';
+import 'package:idsr/application/signals/signal_bloc.dart';
+import 'package:idsr/application/signals/signal_event.dart';
+import 'package:idsr/application/signals/signal_state.dart';
 import 'package:idsr/data/entity/models/tracked_entity.dart';
+import 'package:idsr/dependency_injector.dart';
 import 'package:idsr/presentation/chart.dart';
 import 'package:idsr/presentation/grade_details.dart';
 import 'package:idsr/presentation/map.dart';
 import 'package:idsr/presentation/marquee.dart';
 import 'package:idsr/routes/routes_name.dart';
 import 'package:idsr/utils/utils.dart';
+import 'package:intl/intl.dart';
 
 import 'filters.dart';
 
@@ -19,129 +25,180 @@ class WhoAfrDashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFececec),
-      appBar: AppBar(
-        elevation: 0,
-        title:
-      _buildHeader(context) ,
-      actions: [      IconButton(
-        icon: const Icon(Icons.filter_list),
-        onPressed: () {
-          // Example: show a bottom sheet for filters
-          showModalBottomSheet(
-            isScrollControlled: true,
-            context: context,
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-            ),
-            builder: (context) =>  SizedBox(
-                height: MediaQuery.of(context).size.height * 0.9,
-                width: double.infinity,
-                child:SingleChildScrollView(child: FilterScreenUI())
-              // Column(
-              //   children: [
-              //     Padding(
-              //       padding: const EdgeInsets.all(8.0),
-              //       child: Text(
-              //         "Filters",
-              //         style: TextStyle(
-              //           fontSize: 18,
-              //           fontWeight: FontWeight.w600,
-              //           color: Colors.black,
-              //         ),
-              //         textAlign: TextAlign.center,
-              //       ),
-              //     ),
-              //   ],
-              // ),
-            ),
-          );
-        },
-      ),
-      ],
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Builder(
-              builder: (context) {
-
-                final trackedEntity=context.read<EntityBloc>().trackedEntity;
-                final ongoing= getOngoing(trackedEntity);
-               final grade3= countByGrades(ongoing,"Grade 3",dataElement: "swCuEaReUQr");
-                final grade2= countByGrades(ongoing,"Grade 2",dataElement: "swCuEaReUQr");
-                final grade1= countByGrades(ongoing,"Grade 1",dataElement: "swCuEaReUQr");
-                final ungraded= countByGrades(ongoing,"Ungraded",dataElement: "swCuEaReUQr");
-
-                final p3= countByGrades(ongoing,"Protracted3",dataElement: "swCuEaReUQr");
-                final p2= countByGrades(ongoing,"Protracted2",dataElement: "swCuEaReUQr");
-                final p1= countByGrades(ongoing,"Protracted1",dataElement: "swCuEaReUQr");
-
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        "Signals",
-                        style: TextStyle(fontSize: 18,fontWeight: FontWeight.w700,color: Colors.black),
+    return
+      BlocProvider(create: (context) => SignalBloc(entityRepository: injector())..add(GetTrackedSignalEvent(programeId: 'E12ZY36aT08')),
+      child: Scaffold(
+        backgroundColor: const Color(0xFFececec),
+        appBar: AppBar(
+          elevation: 0,
+          title:
+        _buildHeader(context) ,
+        actions: [      IconButton(
+          icon: const Icon(Icons.filter_list),
+          onPressed: () {
+            // Example: show a bottom sheet for filters
+            showModalBottomSheet(
+              isScrollControlled: true,
+              context: context,
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              ),
+              builder: (context) =>  SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.9,
+                  width: double.infinity,
+                  child:SingleChildScrollView(child: FilterScreenUI())
+                // Column(
+                //   children: [
+                //     Padding(
+                //       padding: const EdgeInsets.all(8.0),
+                //       child: Text(
+                //         "Filters",
+                //         style: TextStyle(
+                //           fontSize: 18,
+                //           fontWeight: FontWeight.w600,
+                //           color: Colors.black,
+                //         ),
+                //         textAlign: TextAlign.center,
+                //       ),
+                //     ),
+                //   ],
+                // ),
+              ),
+            );
+          },
+        ),
+        ],
+        ),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Builder(
+                builder: (context) {
+      
+                  final trackedEntity=context.read<EntityBloc>().trackedEntity;
+                  final ongoing= getOngoing(trackedEntity);
+                 final grade3= countByGrades(ongoing,"Grade 3",dataElement: "swCuEaReUQr");
+                  final grade2= countByGrades(ongoing,"Grade 2",dataElement: "swCuEaReUQr");
+                  final grade1= countByGrades(ongoing,"Grade 1",dataElement: "swCuEaReUQr");
+                  final ungraded= countByGrades(ongoing,"Ungraded",dataElement: "swCuEaReUQr");
+      
+                  final p3= countByGrades(ongoing,"Protracted3",dataElement: "swCuEaReUQr");
+                  final p2= countByGrades(ongoing,"Protracted2",dataElement: "swCuEaReUQr");
+                  final p1= countByGrades(ongoing,"Protracted1",dataElement: "swCuEaReUQr");
+      
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          "Signals",
+                          style: TextStyle(fontSize: 18,fontWeight: FontWeight.w700,color: Colors.black),
+                        ),
                       ),
-                    ),
-                    InfiniteScrollRow(),
-                    // const SizedBox(height: 14),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        "Events",
-                        style: TextStyle(fontSize: 18,fontWeight: FontWeight.w700,color: Colors.black),
-                      ),
-                    ),
-                    _buildQuickStats(),
-                    // const SizedBox(height: 8),
-                    Container(
-                      padding: EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        // color: Color(0xFF28283a),
-                        borderRadius: BorderRadius.circular(5),),
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              gradeCard(context,grade3,"Grade 3",const Color(0xFFFF2E2E)),
-                              gradeCard(context,grade2,"Grade 2",const Color(0xFFFF7A7A)),
-                              gradeCard(context,grade1,"Grade 1",const Color(0xFFFFD6D6)),
-                              gradeCard(context,ungraded,"UnGraded",const Color(0xFF4A4F58),txtColor: Colors.white)
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              gradeCard(context,p3,"Protracted 3",const Color(0xFFE78A52)),
-                              gradeCard(context,p2,"Protracted 2",const  Color(0xFFF3C3A3)),
-                              gradeCard(context,p1,"Protracted 1",const Color(0xFFF7E9D4)),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
+                      BlocBuilder(
+                        bloc: context.read<SignalBloc>(),
+                        builder: (context,state) {
 
-                    const SizedBox(height: 8),
-                    SizedBox(
-                      height: 400,
-                      child: MyMapWidget(),
-                    ),
-                    SizedBox(height: 20,),
-                    _buildPriorityAndTrends(),
-                    const SizedBox(height: 90),
-                  ],
-                );
-              }
+                          final trackedEntity=context.read<SignalBloc>().trackedEntity;
+                          // print("object===");
+                          // print(trackedEntity.length);
+                          if(state is GetTrackedSignalCompleted){
+                            final recents=filterByDays(trackedEntity, 14);
+                          return InfiniteScrollRow(recents);
+                          }
+                          return const Center(child: CircularProgressIndicator());
+                        }
+                      ),
+                      SizedBox(height: 10,),
+                      BlocBuilder(
+                          bloc: context.read<SignalBloc>(),
+                          builder: (context,state) {
+                            if(state is GetTrackedSignalCompleted){
+                              final trackedEntity=context.read<SignalBloc>().trackedEntity;
+
+                              final recents3d=filterByDays(trackedEntity, 3);
+                              final recents7d=filterByDays(trackedEntity, 7);
+                              final underMonitoring= getUnderMonitoring(trackedEntity);
+
+                              return SizedBox(
+                                height: 80,
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: _buildSignalCard(trackedEntity.length, "All"),
+                                    ),
+                                    Expanded(
+                                      child: _buildSignalCard(recents3d.length, "Past 3d"),
+                                    ),
+                                    Expanded(
+                                      child: _buildSignalCard(recents7d.length, "Past 7d"),
+                                    ),
+                                    Expanded(
+                                      child: _buildSignalCard(underMonitoring.length, "Under monitoring"),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }
+                            return const Center(child: CircularProgressIndicator());
+
+                        }
+                      ),
+                      // const SizedBox(height: 14),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          "Events",
+                          style: TextStyle(fontSize: 18,fontWeight: FontWeight.w700,color: Colors.black),
+                        ),
+                      ),
+                      _buildQuickStats(),
+                      // const SizedBox(height: 8),
+                      Container(
+                        padding: EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          // color: Color(0xFF28283a),
+                          borderRadius: BorderRadius.circular(5),),
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                gradeCard(context,grade3,"Grade 3",const Color(0xFFFF2E2E)),
+                                gradeCard(context,grade2,"Grade 2",const Color(0xFFFF7A7A)),
+                                gradeCard(context,grade1,"Grade 1",const Color(0xFFFFD6D6)),
+                                gradeCard(context,ungraded,"UnGraded",const Color(0xFF4A4F58),txtColor: Colors.white)
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                gradeCard(context,p3,"Protracted 3",const Color(0xFFE78A52)),
+                                gradeCard(context,p2,"Protracted 2",const  Color(0xFFF3C3A3)),
+                                gradeCard(context,p1,"Protracted 1",const Color(0xFFF7E9D4)),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+      
+                      const SizedBox(height: 8),
+                      SizedBox(
+                        height: 300,
+                        child: MyMapWidget(),
+                      ),
+                      SizedBox(height: 20,),
+                      _priorityCard(ongoing),
+                      const SizedBox(height: 90),
+                    ],
+                  );
+                }
+              ),
             ),
           ),
         ),
+        // bottomNavigationBar: _buildBottomNav(),
       ),
-      // bottomNavigationBar: _buildBottomNav(),
     );
   }
 
@@ -346,78 +403,81 @@ class WhoAfrDashboard extends StatelessWidget {
 
 
 
-  Widget _buildPriorityAndTrends() {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(child: _priorityCard()),
-        // const SizedBox(width: 10),
-        // Expanded(child: _trendsCard()),
-      ],
-    );
-  }
 
-  Widget _priorityCard() {
+
+  Widget _priorityCard(List<TrackedEntity> trackedEntity) {
+    final recent = filterByRecentEvent(trackedEntity, 28);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Color(0xFF262b3f),
+        gradient: LinearGradient(
+          colors: [
+            Color(0xFF4287F5),
+            Color(0xFF153F94),
+          ],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
-          Text("Recent Events", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16,color: Colors.white)),
+        children:  [
+          Text("Recent Events (${recent.length})", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18,color: Colors.white)),
           SizedBox(height: 10),
-          Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-            children:[ Row(
-              children: [
-                Text("Priority Events",style: TextStyle(color: Colors.white,fontWeight:FontWeight.w600 ,fontSize: 14),),
-                Icon(Icons.check_circle, color: Colors.green,size: 15,)
-              ],
-            ),
-            Text("Kur vesven leconton, ot Kover auil, 2018",style: TextStyle(color: Colors.white,fontSize: 11),),
-]
-          ),
-          SizedBox(height: 10),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-              children: [
-                Text("Hontolled Avents",style: TextStyle(color: Colors.white,fontWeight:FontWeight.w600,fontSize: 14),),
-                Icon(Icons.check_circle, color: Colors.green,size: 15,)
-              ],
-            ),
-              Text("Kur vesven leconion, ot Kover auil, 2016",style: TextStyle(color: Colors.white,fontSize: 11),),
+          ListView.separated(
+            itemCount: recent.length,
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+            itemBuilder: (context, index) {
+              final ent=recent[index];
+              Enrollment enrollment=ent.enrollments[0];
 
-            ]
+              TeiAttribute?   eventNameAttribute = ent.attributes.firstWhereOrNull(
+                    (attr) => attr.displayName == "Event name",
+                // orElse: () => null,
+              );
+              TeiAttribute?   eventNoteAttribute = ent.attributes.firstWhereOrNull(
+                    (attr) => attr.displayName == "Notes",
+                // orElse: () => null,
+              );
+              TeiAttribute?   evendateAttribute =ent.attributes.firstWhereOrNull(
+                    (attr) => attr.attribute == "IXtYxqMzT6W",
+                // orElse: () => null,
+              );
+              final eventdate=evendateAttribute?.value;
+              final eventname=eventNameAttribute?.value;
+              final notes=eventNoteAttribute?.value;
+              return  Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(child: Text("$eventname | ${enrollment.orgUnitName}",style: TextStyle(color: Colors.white,fontWeight:FontWeight.w600,fontSize: 14),)),
 
+                        ],
+                      ),
+                      Text("$eventdate",style: TextStyle(color: Colors.white.withValues(alpha: 0.5),fontSize: 11),),
+                      Text("$notes",style: TextStyle(color: Colors.white,fontSize: 11),),
+
+                    ]
+
+                ),
+              );
+            }, separatorBuilder: (BuildContext context, int index) {
+              return Center(child: SizedBox(
+                   width: MediaQuery.of(context).size.width*0.2,
+                  child: Divider(color: Colors.white,)));
+          },
           ),
+
         ],
       ),
     );
   }
 
-  Widget _trendsCard() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
-          Text("Trends", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-          SizedBox(height: 16),
-          // Placeholder(fallbackHeight: 150),
-          LineChartSample5()
-        ],
-      ),
-    );
-  }
 
 
 }
@@ -508,3 +568,62 @@ EventItem? getLastEvent(Enrollment? enrollment) {
   return events.isNotEmpty ? events.last : null;
 
 }
+Widget _buildSignalCard(int count, String label) {
+  return Container(
+    margin: const EdgeInsets.symmetric(horizontal: 4),
+    padding: const EdgeInsets.all(5),
+    width: double.infinity,
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(10),
+      border: Border.all(
+        color: Colors.grey,
+        width: 1,
+      ),
+
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        AutoSizeText(
+          label,
+          maxLines: 2,
+          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.black),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(2.0),
+          child: AutoSizeText(NumberFormat('#,###').format(count), style: const TextStyle(color: Color(0xFF153F94), fontSize: 18,fontWeight: FontWeight.bold),textAlign: TextAlign.center,),
+        ),
+
+      ],
+    ),
+  );
+}
+
+List<TrackedEntity> getUnderMonitoring(List<TrackedEntity> trackedEntity) {
+  final List<TrackedEntity> ongoingEvents = [];
+
+  for (final enrollment in trackedEntity) {
+
+    final lastEvent=getLastEvent(enrollment.enrollments[0]);
+
+    if(lastEvent!=null){
+
+      final hasOngoingStatus =lastEvent.dataValues.any(
+            (dv) =>
+        dv.dataElement == "KC59GGouL5n" &&
+            dv.value == "Under Monitoring" ,
+      );
+
+
+      if (hasOngoingStatus) {
+
+        ongoingEvents.add(enrollment);
+      }
+    }
+  }
+
+  return ongoingEvents;
+}
+

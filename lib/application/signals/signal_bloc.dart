@@ -1,26 +1,26 @@
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:idsr/application/entity/entity_event.dart';
-import 'package:idsr/application/entity/entity_state.dart';
+import 'package:idsr/application/signals/signal_event.dart';
+import 'package:idsr/application/signals/signal_state.dart';
 import 'package:idsr/data/entity/models/tracked_entity.dart';
 import 'package:idsr/data/entity/repository/entity_repository.dart';
 
 
-class EntityBloc extends Bloc<EntityEvent, EntityState> {
+class SignalBloc extends Bloc<SignalEvent, SignalState> {
   final EntityRepository entityRepository;
 
   List<TrackedEntity> _trackedEntity=[];
   List<TrackedEntity> get trackedEntity => _trackedEntity;
 
-  EntityBloc({required this.entityRepository})
-      : super(EntityInitial()) {
+  SignalBloc({required this.entityRepository})
+      : super(SignalInitial()) {
 
-    on<GetTrackedEntityEvent>((event, emit) async {
-      emit(GetTrackedEntityLoading());
-      final response = await entityRepository.getTrackedEntity(programeId: event.programeId);
+    on<GetTrackedSignalEvent>((event, emit) async {
+      emit(GetTrackedSignalLoading());
+      final response = await entityRepository.getTrackedEntity(programeId:event.programeId);
       emit(response.fold(
               (error) {
-            return GetTrackedEntityError(
+            return GetTrackedSignalError(
               code: error.errorCode!,
               message: error.errorMessage,
             );
@@ -43,7 +43,7 @@ class EntityBloc extends Bloc<EntityEvent, EntityState> {
 
 
 
-        return GetTrackedEntityCompleted(
+        return GetTrackedSignalCompleted(
           trackedEntity: _trackedEntity,
         );
       }));

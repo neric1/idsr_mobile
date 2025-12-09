@@ -32,7 +32,7 @@ class _SplashScreenState extends State<SplashScreen> {
       body: SafeArea(
         child: BlocListener<EntityBloc, EntityState>(
           bloc: context.read<EntityBloc>()
-            ..add(GetTrackedEntityEvent()),
+            ..add(GetTrackedEntityEvent(programeId: 'bG3Arfj8AtF')),
           listener: (context, preState) async {
             if(preState is GetTrackedEntityCompleted ){
               try {

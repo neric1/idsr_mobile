@@ -84,3 +84,36 @@ Map<String, dynamic> countByGrades(
     "gradedEntity":gradedEntity
   };
 }
+List<TrackedEntity> filterByDays(
+    List<TrackedEntity> list, int days
+    ) {
+  return list.where((item) {
+    final dt = DateTime.parse(item.created);
+    return DateTime.now().difference(dt).inHours <= days * 24;
+  }).toList();
+}
+
+List<TrackedEntity> filterByRecentEvent(
+    List<TrackedEntity> list,
+    int days,
+    ) {
+  final now = DateTime.now();
+
+  return list.where((item) {
+    final history = item.attributes;
+    TeiAttribute?   eventNoteAttribute =history.firstWhereOrNull(
+          (attr) => attr.attribute == "IXtYxqMzT6W",
+      // orElse: () => null,
+    );
+    final eventNote=eventNoteAttribute?.value;
+    // print(eventNote)
+
+    if(eventNote==null){
+      return false;
+    }
+    // print(eventNote)
+    final dt = DateTime.parse(eventNote);
+    return DateTime.now().difference(dt).inHours <= days * 24;
+
+  }).toList();
+}

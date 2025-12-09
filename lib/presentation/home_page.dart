@@ -102,7 +102,7 @@ class _HomePageState extends State<HomePage> {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    InfiniteScrollRow(),
+                    // InfiniteScrollRow(),
                     const SizedBox(height: 16),
                     GridView.count(
                       shrinkWrap: true,

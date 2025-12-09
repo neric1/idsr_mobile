@@ -7,8 +7,8 @@ abstract class EntityEvent extends Equatable {
 }
 
 class GetTrackedEntityEvent extends EntityEvent {
-
-  // GetTrackedEntityEvent({required this.parms,required this.searchRequest});
+  String programeId;
+  GetTrackedEntityEvent({required this.programeId});
 
 }
 

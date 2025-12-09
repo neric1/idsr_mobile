@@ -1,7 +1,14 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
+import 'package:idsr/data/entity/models/tracked_entity.dart';
+
 class InfiniteScrollRow extends StatefulWidget {
+  final List<TrackedEntity> trackedEntity;
+
+  InfiniteScrollRow(this.trackedEntity);
+
   @override
   _InfiniteScrollRowState createState() => _InfiniteScrollRowState();
 }
@@ -59,8 +66,14 @@ class _InfiniteScrollRowState extends State<InfiniteScrollRow> {
       child: ListView.builder(
         controller: _scrollController,
         scrollDirection: Axis.horizontal,
-        itemCount: extendedColors.length,
+        itemCount: widget.trackedEntity.length,
         itemBuilder: (context, index) {
+          Enrollment enrollment=widget.trackedEntity[index].enrollments[0];
+          TeiAttribute?   eventNameAttribute = widget.trackedEntity[index].attributes.firstWhereOrNull(
+                (attr) => attr.attribute == "LEAwqoW5Rtc",
+            // orElse: () => null,
+          );
+          final eventname=eventNameAttribute?.value;
           return Container(
             // width: 200,
             margin: EdgeInsets.symmetric(horizontal: 8),
@@ -71,7 +84,7 @@ class _InfiniteScrollRowState extends State<InfiniteScrollRow> {
             ),
             child: Center(
               child: Text(
-                'Measles | UGANDA',
+                '$eventname | ${enrollment.orgUnitName}',
                 style: TextStyle(color: Colors.white),
               ),
             ),
