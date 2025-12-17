@@ -30,6 +30,8 @@ class _MyMapWidgetState extends State<MyMapWidget> {
     // TODO: implement initState'
 
   counts=getTrackedEntity(widget.trackedEntity);
+  print("object====");
+  print(counts);
   _loadGeoJson();
 
     super.initState();
@@ -54,8 +56,7 @@ class _MyMapWidgetState extends State<MyMapWidget> {
         final orgUnitName = instance.enrollments[0].orgUnitName as String?;
         final orgUnitId = instance.enrollments[0].orgUnit as String?;
         if (orgUnitName != null) {
-
-          counts[normalizeCountryName(getName(orgUnitName,orgUnitId!))]=(counts[normalizeCountryName(getName(orgUnitName,orgUnitId!))] = counts[normalizeCountryName(orgUnitName)] ?? 0) + 1;
+          counts[normalizeCountryName(getName(orgUnitName,orgUnitId!))] = (counts[normalizeCountryName(getName(orgUnitName,orgUnitId!))] ?? 0) + 1;
         }
       }
     }
@@ -77,12 +78,10 @@ class _MyMapWidgetState extends State<MyMapWidget> {
     _mapController.move(camera.center, newZoom);
   }
   Color colorForCount(int count) {
-    if (count >= 10) return const Color(0xFFD95B43); // red
-    if (count >= 8) return const Color(0xFFF6C85F);
-    if (count >= 6) return const Color(0xFFFFF3B0);
+    if (count >= 9) return  Colors.red; // red
+    if (count >= 7) return  Colors.yellow;
     if (count >= 4) return const Color(0xFFD98C5F);
-    if (count >= 2) return const Color(0xFFF2C18D);
-    if (count >= 1) return const Color(0xFFF8E6CC);
+    if (count >= 1) return const Color(0xFFF2C18D);
     return  Colors.grey;
   }
   List<LatLng> geoJsonRingToLatLng(List ring) {

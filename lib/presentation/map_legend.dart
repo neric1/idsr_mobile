@@ -4,12 +4,10 @@ class MapLegend extends StatelessWidget {
   const MapLegend({super.key});
 
   final List<Map<String, dynamic>> legendItems = const [
-    {'color': Color(0xFFFFF3E0), 'label': '0-2 Events'},
-    {'color': Color(0xFFFFCC80), 'label': '2-4 Events'},
-    {'color': Color(0xFFD79B60), 'label': '4-6 Events'},
-    {'color': Color(0xFFFFF9C4), 'label': '6-8 Events'},
-    {'color': Color(0xFFFFC107), 'label': '8-10 Events'},
-    {'color': Color(0xFFD9534F), 'label': '10+ Events'},
+    {'color': Color(0xFFF2C18D), 'label': '1-4 Events'},
+    {'color':  Color(0xFFD98C5F), 'label': '4-7 Events'},
+    {'color': Colors.yellow, 'label': '7-9 Events'},
+    {'color': Colors.red, 'label': '9+ Events'},
   ];
 
   @override
