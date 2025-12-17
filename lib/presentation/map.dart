@@ -34,14 +34,28 @@ class _MyMapWidgetState extends State<MyMapWidget> {
 
     super.initState();
   }
+  getName(String name,String id){
+
+    switch(id){
+      case "jCQVCvr10mf":
+        return "dem rep congo";
+      case "ovvu8SlYevT":
+        return "s sudan";
+      default:
+        return name;
+    }
+
+  }
   getTrackedEntity(List<TrackedEntity> trackedEntity){
     final Map<String, int> counts = {};
 
     for (var instance in trackedEntity) {
       if (instance.enrollments != null && instance.enrollments.isNotEmpty) {
         final orgUnitName = instance.enrollments[0].orgUnitName as String?;
+        final orgUnitId = instance.enrollments[0].orgUnit as String?;
         if (orgUnitName != null) {
-          counts[normalizeCountryName(orgUnitName)] = (counts[normalizeCountryName(orgUnitName)] ?? 0) + 1;
+
+          counts[normalizeCountryName(getName(orgUnitName,orgUnitId!))]=(counts[normalizeCountryName(getName(orgUnitName,orgUnitId!))] = counts[normalizeCountryName(orgUnitName)] ?? 0) + 1;
         }
       }
     }
@@ -153,6 +167,8 @@ class _MyMapWidgetState extends State<MyMapWidget> {
     for (final feature in jsonData['features']) {
       final rawName = feature['properties']['name'];
       final name = normalizeCountryName(rawName);
+      print("objectmm");
+      print(name);
 
       final geometry = feature['geometry'];
 

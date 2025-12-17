@@ -418,7 +418,7 @@ class WhoAfrDashboard extends StatelessWidget {
 
 
   Widget _priorityCard(List<TrackedEntity> trackedEntity) {
-    final recent = filterByRecentEvent(trackedEntity, 28);
+    final recent = filterByRecentEvent(trackedEntity, 14);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
