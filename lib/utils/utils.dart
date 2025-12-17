@@ -93,27 +93,79 @@ List<TrackedEntity> filterByDays(
   }).toList();
 }
 
+// List<TrackedEntity> filterByRecentEvent(
+//     List<TrackedEntity> list,
+//     int days,
+//     ) {
+//   final now = DateTime.now();
+//
+//   return list.where((item) {
+//     final history = item.attributes;
+//     TeiAttribute?   eventNoteAttribute =history.firstWhereOrNull(
+//           (attr) => attr.attribute == "IXtYxqMzT6W",
+//       // orElse: () => null,
+//     );
+//     final eventNote=eventNoteAttribute?.value;
+//     // print(eventNote)
+//
+//     if(eventNote==null){
+//       return false;
+//     }
+//     // print(eventNote)
+//     final dt = DateTime.parse(eventNote);
+//     return DateTime.now().difference(dt).inHours <= days * 24;
+//
+//   }).toList();
+// }
 List<TrackedEntity> filterByRecentEvent(
     List<TrackedEntity> list,
     int days,
     ) {
   final now = DateTime.now();
 
-  return list.where((item) {
-    final history = item.attributes;
-    TeiAttribute?   eventNoteAttribute =history.firstWhereOrNull(
-          (attr) => attr.attribute == "IXtYxqMzT6W",
-      // orElse: () => null,
+  final filtered = list
+      .map((item) {
+    final attr = item.attributes.firstWhereOrNull(
+          (a) => a.attribute == "IXtYxqMzT6W",
     );
-    final eventNote=eventNoteAttribute?.value;
-    // print(eventNote)
 
-    if(eventNote==null){
-      return false;
-    }
-    // print(eventNote)
-    final dt = DateTime.parse(eventNote);
-    return DateTime.now().difference(dt).inHours <= days * 24;
+    if (attr?.value == null) return null;
 
-  }).toList();
+    return MapEntry(item, DateTime.parse(attr!.value!));
+  })
+      .whereType<MapEntry<TrackedEntity, DateTime>>()
+      .where((entry) => now.difference(entry.value).inDays <= days)
+      .toList();
+
+  // 🔽 sort by most recent first
+  filtered.sort((a, b) => b.value.compareTo(a.value));
+
+  // 🔢 take only 5
+  return filtered.map((e) => e.key).toList();
+}
+String getCountryNameOnMap(String countryId, String name) {
+  switch (countryId) {
+    case "FBp81RH2tMk":
+      return "Tanzania";
+    case "ovvu8SlYevT":
+      return "S. Sudan";
+    case "OhZHTN8wn0t":
+      return "Côte d'Ivoire";
+    case "HZtKIozL115":
+      return "Sierra Leone";
+    case "ZoH5flTZbXw":
+      return "Central African Rep.";
+    case "jCQVCvr10mf":
+      return "Dem. Rep. Congo";
+    case "XhcIn2FWihU":
+      return "South Africa";
+    case "CHG4FtC04EF":
+      return "Burkina Faso";
+    case "Vpy7G6Pg0bI":
+      return "Eq. Guinea";
+    case "DssnVxramcD":
+      return "eSwatini";
+    default:
+      return name;
+  }
 }

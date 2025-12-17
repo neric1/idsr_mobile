@@ -5,8 +5,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:idsr/data/entity/models/tracked_entity.dart';
 import 'package:idsr/presentation/map_legend.dart';
+import 'package:idsr/utils/utils.dart';
 import 'package:latlong2/latlong.dart';
-
+const  removedCountry=[ "morocco","libya", "tunisia", "sudan", "egypt", "djibouti", "somalia","somaliland","w. sahara"];
 class MyMapWidget extends StatefulWidget {
   List<TrackedEntity> trackedEntity;
   MyMapWidget({super.key,required this.trackedEntity});
@@ -30,24 +31,12 @@ class _MyMapWidgetState extends State<MyMapWidget> {
     // TODO: implement initState'
 
   counts=getTrackedEntity(widget.trackedEntity);
-  print("object====");
-  print(counts);
+
   _loadGeoJson();
 
     super.initState();
   }
-  getName(String name,String id){
 
-    switch(id){
-      case "jCQVCvr10mf":
-        return "dem rep congo";
-      case "ovvu8SlYevT":
-        return "s sudan";
-      default:
-        return name;
-    }
-
-  }
   getTrackedEntity(List<TrackedEntity> trackedEntity){
     final Map<String, int> counts = {};
 
@@ -56,7 +45,7 @@ class _MyMapWidgetState extends State<MyMapWidget> {
         final orgUnitName = instance.enrollments[0].orgUnitName as String?;
         final orgUnitId = instance.enrollments[0].orgUnit as String?;
         if (orgUnitName != null) {
-          counts[normalizeCountryName(getName(orgUnitName,orgUnitId!))] = (counts[normalizeCountryName(getName(orgUnitName,orgUnitId!))] ?? 0) + 1;
+          counts[normalizeCountryName(getCountryNameOnMap(orgUnitId!,orgUnitName))] = (counts[normalizeCountryName(getCountryNameOnMap(orgUnitId,orgUnitName))] ?? 0) + 1;
         }
       }
     }
@@ -78,11 +67,11 @@ class _MyMapWidgetState extends State<MyMapWidget> {
     _mapController.move(camera.center, newZoom);
   }
   Color colorForCount(int count) {
-    if (count >= 9) return  Colors.red; // red
-    if (count >= 7) return  Colors.yellow;
-    if (count >= 4) return const Color(0xFFD98C5F);
-    if (count >= 1) return const Color(0xFFF2C18D);
-    return  Colors.grey;
+    if (count >= 9) return  Colors.red.shade900;
+    if (count >= 6) return Colors.orange.shade900;
+    if (count >= 3) return Colors.orange.shade300;
+    if (count >= 1) return  Colors.yellow.shade200;
+    return  Color(0xFF248f24);
   }
   List<LatLng> geoJsonRingToLatLng(List ring) {
     return ring.map<LatLng>((point) {
@@ -114,7 +103,7 @@ class _MyMapWidgetState extends State<MyMapWidget> {
 
     final int count = counts[countryName] ?? 0;
 
-    final fillColor = colorForCount(count);
+    final fillColor = removedCountry.contains(countryName)?Colors.grey :colorForCount(count);
 
     polygons.add(
       Polygon(
@@ -125,24 +114,24 @@ class _MyMapWidgetState extends State<MyMapWidget> {
       ),
     );
 
-    if (shouldShowCircle(count)) {
-      final size = circleSizeForCount(count);
-
-      markers.add(
-        Marker(
-          width: size,
-          height: size,
-          point: _computeCentroid(points),
-          child: Container(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: fillColor,
-              border: Border.all(color: Colors.red.shade900, width: 1),
-            ),
-          ),
-        ),
-      );
-    }
+    // if (shouldShowCircle(count)) {
+    //   final size = circleSizeForCount(count);
+    //
+    //   markers.add(
+    //     Marker(
+    //       width: size,
+    //       height: size,
+    //       point: _computeCentroid(points),
+    //       child: Container(
+    //         decoration: BoxDecoration(
+    //           shape: BoxShape.circle,
+    //           color: fillColor,
+    //           border: Border.all(color: Colors.red.shade900, width: 1),
+    //         ),
+    //       ),
+    //     ),
+    //   );
+    // }
   }
   String normalizeCountryName(String name) {
     return name
@@ -166,8 +155,7 @@ class _MyMapWidgetState extends State<MyMapWidget> {
     for (final feature in jsonData['features']) {
       final rawName = feature['properties']['name'];
       final name = normalizeCountryName(rawName);
-      print("objectmm");
-      print(name);
+
 
       final geometry = feature['geometry'];
 
@@ -309,7 +297,7 @@ class _MyMapWidgetState extends State<MyMapWidget> {
         Positioned(
           bottom: 0,
           left: 0,
-          child: const MapLegend(),
+          child:  MapLegend(),
         ),
       ],
     );

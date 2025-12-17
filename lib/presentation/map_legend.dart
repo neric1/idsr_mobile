@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 
 class MapLegend extends StatelessWidget {
-  const MapLegend({super.key});
+   MapLegend({super.key});
 
-  final List<Map<String, dynamic>> legendItems = const [
-    {'color': Color(0xFFF2C18D), 'label': '1-4 Events'},
-    {'color':  Color(0xFFD98C5F), 'label': '4-7 Events'},
-    {'color': Colors.yellow, 'label': '7-9 Events'},
-    {'color': Colors.red, 'label': '9+ Events'},
+  final List<Map<String, dynamic>> legendItems =  [
+
+    {'color': Colors.yellow.shade200, 'label': '1-3 Events'},
+    {'color': Colors.orange.shade300, 'label': '3-6 Events'},
+    {'color':  Colors.orange.shade900, 'label': '6-9 Events'},
+    {'color': Colors.red.shade900, 'label': '9+ Events'},
   ];
 
   @override
@@ -42,7 +43,7 @@ class MapLegend extends StatelessWidget {
                   width: 10,
                   height: 10,
                   decoration: BoxDecoration(
-                    color: item['color'],
+                    color: item['color'].withOpacity(0.6),
                     shape: BoxShape.circle,
                     border: Border.all(color: Colors.black12, width: 0.5),
                   ),
