@@ -47,21 +47,26 @@ class _SplashScreenState extends State<SplashScreen> {
           child: Center(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
+              child: Stack(
                 children: [
-
-
-                  Text(
-                    "SEMS",
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                      letterSpacing: 1.2,
+                  Image.asset('assets/logo2.png',height: 200,width: 200,fit: BoxFit.contain,),
+                  Positioned(
+                    bottom: 0, // distance from bottom
+                    left: 0,
+                    right: 0,
+                    child: Center(
+                      child: Text(
+                        "SEMS",
+                        style: TextStyle(
+                          fontSize: 40,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF2c6693),
+                          letterSpacing: 1.2,
+                        ),
+                      ),
                     ),
                   ),
+
       
       
       

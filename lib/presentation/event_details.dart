@@ -31,11 +31,13 @@ class EventDetails extends StatelessWidget {
               itemBuilder: (context, index) {
                 final entity=trackedEntities[index];
                 TeiAttribute?   eventNameAttribute = entity.attributes.firstWhereOrNull(
-                      (attr) => attr.displayName == "Event name",
+                      (attr) {
+                        return attr.displayName == "Event name" || attr.attribute == "LEAwqoW5Rtc";
+                      },
                   // orElse: () => null,
                 );
                 TeiAttribute?   eventNoteAttribute = entity.attributes.firstWhereOrNull(
-                      (attr) => attr.displayName == "Notes",
+                      (attr) => attr.displayName == "Notes" || attr.attribute=="WS6ww4XQZko",
                   // orElse: () => null,
                 );
                 final eventname=eventNameAttribute?.value;

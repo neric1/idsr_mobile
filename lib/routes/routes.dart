@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:idsr/presentation/event_details.dart';
 import 'package:idsr/presentation/grade_details.dart';
 import 'package:idsr/presentation/home_page.dart';
+import 'package:idsr/presentation/signals_details.dart';
 import 'package:idsr/presentation/splash_screen.dart';
 import 'package:idsr/presentation/who_afro_dashboard.dart';
 import 'package:idsr/routes/routes_name.dart';
@@ -46,5 +47,14 @@ class Routes {
               final title = (state.extra
               as Map<String, dynamic>?)?["event_name"];
               return  EventDetails(trackedEntities: grades,title: title,);}
+        ),
+        GoRoute(
+            name: SIGNAL_DETAILS,
+            path: SIGNAL_DETAILS,
+
+            builder: (context, state) {
+              final entity = (state.extra
+              as Map<String, dynamic>?)?["entity"];
+              return  SignalsDetails(trackedEntity: entity);}
         ),
   ]);}

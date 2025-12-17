@@ -151,7 +151,7 @@ class _HomePageState extends State<HomePage> {
                     const SizedBox(height: 16),
                      SizedBox(
                       height: 500,
-                      child: MyMapWidget(),
+                      child: Container(),
                     ),
                     SizedBox(height: 20,),
                     Container(

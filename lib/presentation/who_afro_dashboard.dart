@@ -75,18 +75,18 @@ class WhoAfrDashboard extends StatelessWidget {
               padding: const EdgeInsets.all(16.0),
               child: Builder(
                 builder: (context) {
-      
+
                   final trackedEntity=context.read<EntityBloc>().trackedEntity;
                   final ongoing= getOngoing(trackedEntity);
                  final grade3= countByGrades(ongoing,"Grade 3",dataElement: "swCuEaReUQr");
                   final grade2= countByGrades(ongoing,"Grade 2",dataElement: "swCuEaReUQr");
                   final grade1= countByGrades(ongoing,"Grade 1",dataElement: "swCuEaReUQr");
                   final ungraded= countByGrades(ongoing,"Ungraded",dataElement: "swCuEaReUQr");
-      
+
                   final p3= countByGrades(ongoing,"Protracted3",dataElement: "swCuEaReUQr");
                   final p2= countByGrades(ongoing,"Protracted2",dataElement: "swCuEaReUQr");
                   final p1= countByGrades(ongoing,"Protracted1",dataElement: "swCuEaReUQr");
-      
+
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -127,16 +127,16 @@ class WhoAfrDashboard extends StatelessWidget {
                                 child: Row(
                                   children: [
                                     Expanded(
-                                      child: _buildSignalCard(trackedEntity.length, "All"),
+                                      child: _buildSignalCard(trackedEntity, "All",context),
                                     ),
                                     Expanded(
-                                      child: _buildSignalCard(recents3d.length, "Past 3d"),
+                                      child: _buildSignalCard(recents3d, "Past 3d",context),
                                     ),
                                     Expanded(
-                                      child: _buildSignalCard(recents7d.length, "Past 7d"),
+                                      child: _buildSignalCard(recents7d, "Past 7d",context),
                                     ),
                                     Expanded(
-                                      child: _buildSignalCard(underMonitoring.length, "Under monitoring"),
+                                      child: _buildSignalCard(underMonitoring, "Under monitoring",context),
                                     ),
                                   ],
                                 ),
@@ -165,27 +165,33 @@ class WhoAfrDashboard extends StatelessWidget {
                           children: [
                             Row(
                               children: [
-                                gradeCard(context,grade3,"Grade 3",const Color(0xFFFF2E2E)),
-                                gradeCard(context,grade2,"Grade 2",const Color(0xFFFF7A7A)),
-                                gradeCard(context,grade1,"Grade 1",const Color(0xFFFFD6D6)),
-                                gradeCard(context,ungraded,"UnGraded",const Color(0xFF4A4F58),txtColor: Colors.white)
+                                gradeCard(context,grade3,"G3",const Color(0xFFFF2E2E)),
+                                gradeCard(context,grade2,"G2",const Color(0xFFFF7A7A)),
+                                gradeCard(context,grade1,"G1",const Color(0xFFFFD6D6)),
+                                gradeCard(context,ungraded,"UG",const Color(0xFF4A4F58),txtColor: Colors.white)
                               ],
                             ),
                             Row(
                               children: [
-                                gradeCard(context,p3,"Protracted 3",const Color(0xFFE78A52)),
-                                gradeCard(context,p2,"Protracted 2",const  Color(0xFFF3C3A3)),
-                                gradeCard(context,p1,"Protracted 1",const Color(0xFFF7E9D4)),
+                                gradeCard(context,p3,"P3",const Color(0xFFE78A52)),
+                                gradeCard(context,p2,"P2",const  Color(0xFFF3C3A3)),
+                                gradeCard(context,p1,"P1",const Color(0xFFF7E9D4)),
                               ],
                             ),
                           ],
                         ),
                       ),
-      
+
                       const SizedBox(height: 8),
                       SizedBox(
                         height: 300,
-                        child: MyMapWidget(),
+                        child: Builder(
+                          builder: (context) {
+                            final trackedEntity=context.read<EntityBloc>().trackedEntity;
+                            final ongoing= getOngoing(trackedEntity);
+                            return MyMapWidget(trackedEntity: ongoing);
+                          }
+                        ),
                       ),
                       SizedBox(height: 20,),
                       _priorityCard(ongoing),
@@ -229,15 +235,20 @@ class WhoAfrDashboard extends StatelessWidget {
           colorFilter: const ColorFilter.mode(Colors.blue, BlendMode.srcIn),
         ),
 
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-          decoration: BoxDecoration(
-            color: Color(0xFF4287f5),
-            borderRadius: BorderRadius.circular(14),
-          ),
-          child: const Text(
-            "Epi Week 47, 2025",
-            style: TextStyle(color: Colors.white,fontSize: 15),
+        GestureDetector(
+          onTap: (){
+
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+            decoration: BoxDecoration(
+              color: Color(0xFF4287f5),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: const Text(
+              "Epi Week 50, 2025",
+              style: TextStyle(color: Colors.white,fontSize: 15),
+            ),
           ),
         ),
         // const CircleAvatar(radius: 20, backgroundColor: Colors.grey)
@@ -351,6 +362,7 @@ class WhoAfrDashboard extends StatelessWidget {
                 ),
                 child: Text(
                   title,
+                  textAlign: TextAlign.center,
                   style: TextStyle(
                     color: txtColor,
                     fontSize: 13,
@@ -568,35 +580,49 @@ EventItem? getLastEvent(Enrollment? enrollment) {
   return events.isNotEmpty ? events.last : null;
 
 }
-Widget _buildSignalCard(int count, String label) {
-  return Container(
-    margin: const EdgeInsets.symmetric(horizontal: 4),
-    padding: const EdgeInsets.all(5),
-    width: double.infinity,
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(10),
-      border: Border.all(
-        color: Colors.grey,
-        width: 1,
+Widget _buildSignalCard(List<TrackedEntity> levels, String label,BuildContext context) {
+  return
+      GestureDetector(
+        onTap: (){
+          context.pushNamed(EVENT_DETAILS,
+              extra: {
+                "event_name":label,
+                "event_list": levels
+              });
+          // Navigator.push(
+          //   context,
+          //   MaterialPageRoute(builder: (context) => GradeDetails()),
+          // );
+        },
+    child: Container(
+      margin: const EdgeInsets.symmetric(horizontal: 4),
+      padding: const EdgeInsets.all(5),
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: const  Color(0xFFF3C3A3),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: Colors.grey,
+          width: 1,
+        ),
+
       ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          AutoSizeText(
+            label,
+            maxLines: 2,
+            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.black),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(2.0),
+            child: AutoSizeText(NumberFormat('#,###').format(levels.length), style: const TextStyle(color: Color(0xFF153F94), fontSize: 18,fontWeight: FontWeight.bold),textAlign: TextAlign.center,),
+          ),
 
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        AutoSizeText(
-          label,
-          maxLines: 2,
-          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.black),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(2.0),
-          child: AutoSizeText(NumberFormat('#,###').format(count), style: const TextStyle(color: Color(0xFF153F94), fontSize: 18,fontWeight: FontWeight.bold),textAlign: TextAlign.center,),
-        ),
-
-      ],
+        ],
+      ),
     ),
   );
 }
