@@ -31,7 +31,7 @@ class MapLegend extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Number of Events',
+            'Ongoing Events',
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10),
           ),
           const SizedBox(height: 3),

@@ -14,9 +14,11 @@ import 'package:idsr/presentation/chart.dart';
 import 'package:idsr/presentation/grade_details.dart';
 import 'package:idsr/presentation/map.dart';
 import 'package:idsr/presentation/marquee.dart';
+import 'package:idsr/presentation/week_picker.dart';
 import 'package:idsr/routes/routes_name.dart';
 import 'package:idsr/utils/utils.dart';
 import 'package:intl/intl.dart';
+import 'package:jiffy/jiffy.dart';
 
 import 'filters.dart';
 
@@ -237,7 +239,16 @@ class WhoAfrDashboard extends StatelessWidget {
 
         GestureDetector(
           onTap: (){
-
+            showDialog(
+              context: context,
+              builder: (_) => WeekPickerPopup(
+                initialDate: DateTime.now(),
+                onSelected: (range) {
+                  print('Week start: ${range.start}');
+                  print('Week end: ${range.end}');
+                },
+              ),
+            );
           },
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -245,8 +256,8 @@ class WhoAfrDashboard extends StatelessWidget {
               color: Color(0xFF4287f5),
               borderRadius: BorderRadius.circular(14),
             ),
-            child: const Text(
-              "Epi Week 50, 2025",
+            child:  Text(
+              "Epi Week ${Jiffy.now().weekOfYear}, 2025",
               style: TextStyle(color: Colors.white,fontSize: 15),
             ),
           ),

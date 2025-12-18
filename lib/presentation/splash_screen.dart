@@ -32,7 +32,7 @@ class _SplashScreenState extends State<SplashScreen> {
       body: SafeArea(
         child: BlocListener<EntityBloc, EntityState>(
           bloc: context.read<EntityBloc>()
-            ..add(GetTrackedEntityEvent(programeId: 'bG3Arfj8AtF')),
+            ..add(GetTrackedEntityEvent(programeId: 'bG3Arfj8AtF&attribute=IXtYxqMzT6W:GE:1999-12-25:LE:null')),
           listener: (context, preState) async {
             if(preState is GetTrackedEntityCompleted ){
               try {
@@ -47,29 +47,40 @@ class _SplashScreenState extends State<SplashScreen> {
           child: Center(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Stack(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Image.asset('assets/logo2.png',height: 200,width: 200,fit: BoxFit.contain,),
-                  Positioned(
-                    bottom: 0, // distance from bottom
-                    left: 0,
-                    right: 0,
-                    child: Center(
-                      child: Text(
-                        "SEMS",
-                        style: TextStyle(
-                          fontSize: 40,
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFF2c6693),
-                          letterSpacing: 1.2,
+                  Stack(
+                    children: [
+                      Image.asset('assets/logo2.png',height: 200,width: 200,fit: BoxFit.contain,),
+                      Positioned(
+                        bottom: 0, // distance from bottom
+                        left: 0,
+                        right: 0,
+                        child: Center(
+                          child: Text(
+                            "SEMS",
+                            style: TextStyle(
+                              fontSize: 40,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF2c6693),
+                              letterSpacing: 1.2,
+                            ),
+                          ),
                         ),
                       ),
+                    ],
+                  ),
+                  SizedBox(height: 20,),
+                  Text(
+                    "Signals and Events Monitoring",
+                    style: TextStyle(
+                      fontSize: 20,
+                      // fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                      // letterSpacing: 1.2,
                     ),
                   ),
-
-      
-      
-      
                 ],
               ),
             ),

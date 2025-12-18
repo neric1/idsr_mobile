@@ -1,77 +1,81 @@
 import 'package:flutter/material.dart';
+import 'package:jiffy/jiffy.dart';
+import 'package:weekly_date_picker/weekly_date_picker.dart';
 
-class SimpleWeekPicker extends StatefulWidget {
-  final ValueChanged<WeekRange> onChanged;
+class WeekPickerPopup extends StatefulWidget {
+  final DateTime initialDate;
+  final ValueChanged<DateTimeRange> onSelected;
 
-  const SimpleWeekPicker({super.key, required this.onChanged});
+  const WeekPickerPopup({
+    Key? key,
+    required this.initialDate,
+    required this.onSelected,
+  }) : super(key: key);
 
   @override
-  State<SimpleWeekPicker> createState() => _SimpleWeekPickerState();
+  State<WeekPickerPopup> createState() => _WeekPickerPopupState();
 }
 
-class _SimpleWeekPickerState extends State<SimpleWeekPicker> {
-  late WeekRange selectedWeek;
+class _WeekPickerPopupState extends State<WeekPickerPopup> {
+  late DateTime _selectedDate;
 
   @override
   void initState() {
     super.initState();
-    selectedWeek = weekFromDate(DateTime.now());
+    _selectedDate = widget.initialDate;
   }
 
-  Future<void> pickDate() async {
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: selectedWeek.start,
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2035),
-    );
-
-    if (picked != null) {
-      final week = weekFromDate(picked);
-      setState(() => selectedWeek = week);
-      widget.onChanged(week);
-    }
+  DateTimeRange _getWeekRange(DateTime date) {
+    final j = Jiffy.parseFromDateTime(date);
+    DateTime startOfWeek = j.startOf(Unit.week).dateTime;
+    DateTime endOfWeek = j.endOf(Unit.week).dateTime;
+    return DateTimeRange(start: startOfWeek, end: endOfWeek);
   }
-
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: pickDate,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey),
-          borderRadius: BorderRadius.circular(8),
+    // final weekRange = _getWeekRange(_selectedDate);
+
+    return AlertDialog(
+      title: Text('Select Week'),
+      content: SizedBox(
+        width: 300,
+        child:  ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: WeeklyDatePicker(
+            selectedDay: _selectedDate,
+            changeDay: (value) => setState(() {
+              _selectedDate = value;
+            }),
+            enableWeeknumberText: true,
+            weeknumberColor: const Color(0xFF57AF87),
+            weeknumberTextColor: Colors.white,
+            backgroundColor: const Color(0xFF1A237E),
+            weekdayTextColor: const Color(0xFF8A8A8A),
+            digitsColor: Colors.white,
+            selectedDigitBackgroundColor: const Color(0xFF57AF87),
+            weekdays: const ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"],
+            daysInWeek: 7,
+
+          ),
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.calendar_today, size: 16),
-            const SizedBox(width: 8),
-            Text(selectedWeek.label),
-          ],
-        ),
+
+
+
       ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            final range = _getWeekRange(_selectedDate);
+            widget.onSelected(range);
+            Navigator.pop(context);
+          },
+          child: const Text('Select'),
+        ),
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancel'),
+        ),
+      ],
     );
   }
-}
-class WeekRange {
-  final DateTime start;
-  final DateTime end;
-
-  WeekRange(this.start, this.end);
-
-  String get label =>
-      '${_fmt(start)} - ${_fmt(end)}';
-
-  static String _fmt(DateTime d) =>
-      '${d.day.toString().padLeft(2, '0')}/'
-          '${d.month.toString().padLeft(2, '0')}/'
-          '${d.year}';
-}
-
-WeekRange weekFromDate(DateTime date) {
-  final monday = date.subtract(Duration(days: date.weekday - 1));
-  final sunday = monday.add(const Duration(days: 6));
-  return WeekRange(monday, sunday);
 }
