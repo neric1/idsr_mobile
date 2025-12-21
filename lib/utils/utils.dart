@@ -169,3 +169,15 @@ String getCountryNameOnMap(String countryId, String name) {
       return name;
   }
 }
+({int year, int week}) getIsoWeek(DateTime date) {
+  final thursday =
+  date.add(Duration(days: 3 - ((date.weekday + 6) % 7)));
+
+  final isoYear = thursday.year;
+  final firstThursday = DateTime(isoYear, 1, 4);
+
+  final week =
+      1 + ((thursday.difference(firstThursday).inDays) ~/ 7);
+
+  return (year: isoYear, week: week);
+}

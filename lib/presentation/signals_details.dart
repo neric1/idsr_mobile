@@ -5,7 +5,8 @@ import 'package:idsr/data/entity/models/tracked_entity.dart';
 class SignalsDetails extends StatefulWidget {
 
   TrackedEntity trackedEntity;
-   SignalsDetails({super.key,required this.trackedEntity});
+  String? type;
+   SignalsDetails({super.key,required this.trackedEntity, this.type});
 
   @override
   State<SignalsDetails> createState() => _SignalsDetailsState();
@@ -70,11 +71,11 @@ class _SignalsDetailsState extends State<SignalsDetails> {
 
               ),
               Divider(),
-              Padding(
+             widget.type=="signal"? Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: Text("Date of Detection:",style: TextStyle(fontWeight: FontWeight.bold),),
-              ),
-              Container(
+              ):Offstage(),
+              widget.type=="signal"?Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
@@ -88,10 +89,10 @@ class _SignalsDetailsState extends State<SignalsDetails> {
                   child: Text("${date}"
                   ),
                 ),
-              ),
+              ):Offstage(),
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child: Text("Short Description:",style: TextStyle(fontWeight: FontWeight.bold),),
+                child: Text("Description:",style: TextStyle(fontWeight: FontWeight.bold),),
               ),
               Container(
                 decoration: BoxDecoration(

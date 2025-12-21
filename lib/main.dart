@@ -6,6 +6,8 @@ import 'package:idsr/dependency_injector.dart';
 import 'package:idsr/presentation/home_page.dart';
 import 'package:idsr/routes/routes.dart';
 
+import 'application/signals/signal_bloc.dart';
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -26,6 +28,7 @@ class MyApp extends StatelessWidget {
 
     return  MultiBlocProvider(
         providers: [
+        BlocProvider(create: (context) => SignalBloc(entityRepository: injector())),
     BlocProvider(create: (context) => EntityBloc(
     entityRepository: injector(),
     )),],

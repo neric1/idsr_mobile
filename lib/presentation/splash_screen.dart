@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:idsr/application/entity/entity_bloc.dart';
 import 'package:idsr/application/entity/entity_event.dart';
 import 'package:idsr/application/entity/entity_state.dart';
@@ -50,6 +51,15 @@ class _SplashScreenState extends State<SplashScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  Text(
+                    textAlign: TextAlign.center,
+                    "Signals and Events Monitoring",
+                    style:GoogleFonts.raleway(
+                      fontSize: 48,
+                      fontWeight: FontWeight.w200,
+                      color: Colors.white,
+                    ),
+                  ),
                   Stack(
                     children: [
                       Image.asset('assets/logo2.png',height: 200,width: 200,fit: BoxFit.contain,),
@@ -72,15 +82,6 @@ class _SplashScreenState extends State<SplashScreen> {
                     ],
                   ),
                   SizedBox(height: 20,),
-                  Text(
-                    "Signals and Events Monitoring",
-                    style: TextStyle(
-                      fontSize: 20,
-                      // fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                      // letterSpacing: 1.2,
-                    ),
-                  ),
                 ],
               ),
             ),
@@ -96,7 +97,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
     Future.delayed(const Duration(seconds: 2), () async {
       if (!mounted) return;
-    router.goNamed(HOME_ROUTE);
+    // router.goNamed(HOME_ROUTE);
 
     });
   }

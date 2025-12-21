@@ -55,6 +55,8 @@ class Routes {
             builder: (context, state) {
               final entity = (state.extra
               as Map<String, dynamic>?)?["entity"];
-              return  SignalsDetails(trackedEntity: entity);}
+              final type = (state.extra
+              as Map<String, dynamic>?)?["type"];
+              return  SignalsDetails(trackedEntity: entity,type: type,);}
         ),
   ]);}

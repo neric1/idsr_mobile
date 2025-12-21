@@ -9,8 +9,9 @@ import '../routes/routes_name.dart';
 
 class InfiniteScrollRow extends StatefulWidget {
   final List<TrackedEntity> trackedEntity;
+  String? type;
 
-  InfiniteScrollRow(this.trackedEntity);
+  InfiniteScrollRow(this.trackedEntity,this.type);
 
   @override
   _InfiniteScrollRowState createState() => _InfiniteScrollRowState();
@@ -84,7 +85,7 @@ class _InfiniteScrollRowState extends State<InfiniteScrollRow> {
           Enrollment enrollment = widget.trackedEntity[index].enrollments[0];
           TeiAttribute? eventNameAttribute =
               widget.trackedEntity[index].attributes.firstWhereOrNull(
-                    (attr) => attr.attribute == "LEAwqoW5Rtc",
+                    (attr) => attr.attribute == "LEAwqoW5Rtc" || attr.displayName == "Event name",
                     // orElse: () => null,
                   );
           final eventname = eventNameAttribute?.value;
@@ -95,6 +96,7 @@ class _InfiniteScrollRowState extends State<InfiniteScrollRow> {
               context.pushNamed(SIGNAL_DETAILS,
                   extra: {
                     "entity": widget.trackedEntity[index],
+                    "type":widget.type
                   });
             },
             onHighlightChanged: (isHighlighted) {

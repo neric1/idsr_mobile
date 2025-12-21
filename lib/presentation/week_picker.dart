@@ -4,7 +4,8 @@ import 'package:weekly_date_picker/weekly_date_picker.dart';
 
 class WeekPickerPopup extends StatefulWidget {
   final DateTime initialDate;
-  final ValueChanged<DateTimeRange> onSelected;
+  // final ValueChanged<,DateTime> onSelected;
+  final void Function(DateTimeRange range, DateTime selectedDate) onSelected;
 
   const WeekPickerPopup({
     Key? key,
@@ -66,7 +67,7 @@ class _WeekPickerPopupState extends State<WeekPickerPopup> {
         TextButton(
           onPressed: () {
             final range = _getWeekRange(_selectedDate);
-            widget.onSelected(range);
+            widget.onSelected(range,_selectedDate);
             Navigator.pop(context);
           },
           child: const Text('Select'),

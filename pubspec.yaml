@@ -52,6 +52,8 @@ dependencies:
   latlng: ^2.0.7
   jiffy: ^6.4.4
   weekly_date_picker: ^1.4.2
+  week_of_year: ^2.2.0
+  google_fonts: ^6.3.2
 
 
 dev_dependencies:
