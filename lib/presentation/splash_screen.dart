@@ -97,7 +97,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
     Future.delayed(const Duration(seconds: 2), () async {
       if (!mounted) return;
-    // router.goNamed(HOME_ROUTE);
+    router.goNamed(HOME_ROUTE);
 
     });
   }
