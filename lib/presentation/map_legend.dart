@@ -4,7 +4,7 @@ class MapLegend extends StatelessWidget {
    MapLegend({super.key});
 
   final List<Map<String, dynamic>> legendItems =  [
-
+    {'color': Color(0xFF248f24), 'label': '0 Events'},
     {'color': Colors.yellow.shade200, 'label': '1-3 Events'},
     {'color': Colors.orange.shade300, 'label': '3-6 Events'},
     {'color':  Colors.orange.shade900, 'label': '6-9 Events'},

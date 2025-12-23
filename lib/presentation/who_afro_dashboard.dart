@@ -32,23 +32,57 @@ class WhoAfrDashboard extends StatefulWidget {
   State<WhoAfrDashboard> createState() => _WhoAfrDashboardState();
 }
 
-class _WhoAfrDashboardState extends State<WhoAfrDashboard> {
+class _WhoAfrDashboardState extends State<WhoAfrDashboard>   with WidgetsBindingObserver{
   int isoweek=DateTime.now().weekOfYear;
   DateTime current=DateTime.now();
+  DateTime? endDate;
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      // if(!mounted)return;
+      // final dateEnd=endDate!=null?Jiffy.parseFromDateTime(endDate!)
+      //     .format(pattern: 'yyyy-MM-dd'):Jiffy.parseFromDateTime(current)
+      //     .format(pattern: 'yyyy-MM-dd');
+      // context.read<SignalBloc>()
+      //     .add(GetTrackedSignalEvent(programeId: 'E12ZY36aT08&attribute=Zhmz8B6mqEx:GE:2017-01-07:LE:$dateEnd'));
+      // context.read<EntityBloc>()
+      //     .add(GetTrackedEntityEvent(programeId: 'bG3Arfj8AtF&attribute=IXtYxqMzT6W:GE:1999-12-25:LE:$dateEnd'));
+
+    }
+  }
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder(
-      bloc:context.read<SignalBloc>()..add(GetTrackedSignalEvent(programeId: 'E12ZY36aT08&attribute=Zhmz8B6mqEx:GE:2017-01-07:LE:null')),
-
-      builder: (context,state) {
-
-        return Scaffold(
+    return Scaffold(
             backgroundColor: const Color(0xFFececec),
             appBar: AppBar(
               elevation: 0,
               title:
             _buildHeader(context) ,
-            actions: [      IconButton(
+            actions: [
+
+              GestureDetector(
+                  onTap: (){
+                    final dateEnd=endDate!=null?Jiffy.parseFromDateTime(endDate!)
+                        .format(pattern: 'yyyy-MM-dd'):Jiffy.parseFromDateTime(current)
+                        .format(pattern: 'yyyy-MM-dd');
+                    context.read<SignalBloc>()
+                        .add(GetTrackedSignalEvent(programeId: 'E12ZY36aT08&attribute=Zhmz8B6mqEx:GE:2017-01-07:LE:$dateEnd'));
+                    context.read<EntityBloc>()
+                        .add(GetTrackedEntityEvent(programeId: 'bG3Arfj8AtF&attribute=IXtYxqMzT6W:GE:1999-12-25:LE:$dateEnd'));
+
+                  },
+                  child: Icon(Icons.sync)),
+              IconButton(
               icon: const Icon(Icons.filter_list),
               onPressed: () {
                 // Example: show a bottom sheet for filters
@@ -226,8 +260,8 @@ class _WhoAfrDashboardState extends State<WhoAfrDashboard> {
             ),
             // bottomNavigationBar: _buildBottomNav(),
           );
-      }
-    );
+
+
   }
 
   Widget _buildHeader(BuildContext context) {
@@ -269,6 +303,7 @@ class _WhoAfrDashboardState extends State<WhoAfrDashboard> {
                   setState(() {
                     isoweek=range.end.weekOfYear;
                     current=date;
+                    endDate=range.end;
                   });
                   final dateEnd=Jiffy.parseFromDateTime(range.end)
                       .format(pattern: 'yyyy-MM-dd');
@@ -292,7 +327,6 @@ class _WhoAfrDashboardState extends State<WhoAfrDashboard> {
             ),
           ),
         ),
-        // const CircleAvatar(radius: 20, backgroundColor: Colors.grey)
       ],
     );
   }

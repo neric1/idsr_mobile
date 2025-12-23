@@ -26,7 +26,12 @@ class _MyMapWidgetState extends State<MyMapWidget> {
     _mapController.dispose();
     super.dispose();
   }
-@override
+  final polygonHitNotifier =
+  ValueNotifier<LayerHitResult<Object>?>(null);
+
+
+
+  @override
   void initState() {
     // TODO: implement initState'
 
@@ -34,6 +39,18 @@ class _MyMapWidgetState extends State<MyMapWidget> {
 
   _loadGeoJson();
 
+  polygonHitNotifier.addListener(() {
+    final result = polygonHitNotifier.value;
+    if (result == null || result.hitValues.isEmpty) return;
+
+    for (final hit in result.hitValues) {
+      if (hit is Polygon) {
+        // You found the tapped polygon
+        _showTooltip(context, hit.label?.toString() ?? 'Country');
+        break;
+      }
+    }
+  });
     super.initState();
   }
 
@@ -103,7 +120,7 @@ class _MyMapWidgetState extends State<MyMapWidget> {
 
     final int count = counts[countryName] ?? 0;
 
-    final fillColor = removedCountry.contains(countryName)?Colors.grey :colorForCount(count);
+    final fillColor = removedCountry.contains(countryName)?Color(0xFFF2EFE9 ) :colorForCount(count);
 
     polygons.add(
       Polygon(
@@ -251,7 +268,7 @@ class _MyMapWidgetState extends State<MyMapWidget> {
               initialZoom: 2.5,
               backgroundColor: Colors.black,
     interactionOptions: const InteractionOptions(
-    flags: InteractiveFlag.none, // disables drag + everything
+    flags: InteractiveFlag.none,
     ),
             ),
             children: [
@@ -266,6 +283,7 @@ class _MyMapWidgetState extends State<MyMapWidget> {
 
               if (polygons.isNotEmpty)
                 PolygonLayer(
+                  hitNotifier: polygonHitNotifier,
                   polygons: polygons,
                 ),
               if (markers.isNotEmpty)
@@ -319,4 +337,13 @@ class _MyMapWidgetState extends State<MyMapWidget> {
       ),
     );
   }
+}
+void _showTooltip(BuildContext context, String country) {
+  showDialog(
+    context: context,
+    builder: (_) => AlertDialog(
+      title: Text(country),
+      content: Text('Country selected'),
+    ),
+  );
 }
