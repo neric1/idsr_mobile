@@ -11,13 +11,37 @@ class SignalBloc extends Bloc<SignalEvent, SignalState> {
 
   List<TrackedEntity> _trackedEntity=[];
   List<TrackedEntity> get trackedEntity => _trackedEntity;
-
+  List<TrackedEntity> _trackedEntityAll=[];
   SignalBloc({required this.entityRepository})
       : super(SignalInitial()) {
 
     on<GetTrackedSignalEvent>((event, emit) async {
       emit(GetTrackedSignalLoading());
-      final response = await entityRepository.getTrackedEntity(programeId:event.programeId);
+
+      if(event.filterLocal){
+        await Future.delayed(const Duration(seconds: 1));
+        if(event.countryId!="0"){
+          final filteredInstances = _trackedEntityAll.where((instance) {
+            // safely get orgUnit from enrollments
+            if (instance.enrollments.isEmpty) return false;
+
+            final orgUnitId = instance.enrollments[0].orgUnit as String?;
+            return orgUnitId != null && orgUnitId == event.countryId;
+          }).toList();
+          _trackedEntity=filteredInstances;
+          emit(GetTrackedSignalCompleted(
+            trackedEntity: filteredInstances,
+          ));
+        }else{
+          _trackedEntity=_trackedEntityAll;
+          emit(GetTrackedSignalCompleted(
+            trackedEntity: _trackedEntity,
+          ));
+        }
+
+      }else{
+
+        final response = await entityRepository.getTrackedEntity(programeId:event.programeId);
       emit(response.fold(
               (error) {
             return GetTrackedSignalError(
@@ -41,12 +65,12 @@ class SignalBloc extends Bloc<SignalEvent, SignalState> {
         // _hasMoreTeams = newTeams.length >= 100;
         _trackedEntity= safeConvertList(success.data["trackedEntityInstances"]).map((team)=>TrackedEntity.fromJson(team)).toList();
 
-
+        _trackedEntityAll=_trackedEntity;
 
         return GetTrackedSignalCompleted(
           trackedEntity: _trackedEntity,
         );
-      }));
+      }));}
     });
 
   }

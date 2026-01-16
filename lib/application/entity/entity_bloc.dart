@@ -11,13 +11,38 @@ class EntityBloc extends Bloc<EntityEvent, EntityState> {
 
   List<TrackedEntity> _trackedEntity=[];
   List<TrackedEntity> get trackedEntity => _trackedEntity;
+  List<TrackedEntity> _trackedEntityAll=[];
 
   EntityBloc({required this.entityRepository})
       : super(EntityInitial()) {
 
     on<GetTrackedEntityEvent>((event, emit) async {
       emit(GetTrackedEntityLoading());
-      final response = await entityRepository.getTrackedEntity(programeId: event.programeId);
+
+      if(event.filterLocal){
+        await Future.delayed(const Duration(seconds: 1));
+        if(event.countryId!="0"){
+        final filteredInstances = _trackedEntityAll.where((instance) {
+          // safely get orgUnit from enrollments
+          if (instance.enrollments.isEmpty) return false;
+
+          final orgUnitId = instance.enrollments[0].orgUnit as String?;
+          return orgUnitId != null && orgUnitId == event.countryId;
+        }).toList();
+        _trackedEntity=filteredInstances;
+        emit(GetTrackedEntityCompleted(
+          trackedEntity: filteredInstances,
+        ));
+        }else{
+          _trackedEntity=_trackedEntityAll;
+          emit(GetTrackedEntityCompleted(
+            trackedEntity: _trackedEntity,
+          ));
+        }
+
+      }else{
+
+        final response = await entityRepository.getTrackedEntity(programeId: event.programeId);
       emit(response.fold(
               (error) {
             return GetTrackedEntityError(
@@ -40,6 +65,7 @@ class EntityBloc extends Bloc<EntityEvent, EntityState> {
         // // Check if we have more teams (if we got less than perPage, we're at the end)
         // _hasMoreTeams = newTeams.length >= 100;
         _trackedEntity= safeConvertList(success.data["trackedEntityInstances"]).map((team)=>TrackedEntity.fromJson(team)).toList();
+        _trackedEntityAll=_trackedEntity;
 
 
 
@@ -47,6 +73,7 @@ class EntityBloc extends Bloc<EntityEvent, EntityState> {
           trackedEntity: _trackedEntity,
         );
       }));
+      }
     });
 
   }

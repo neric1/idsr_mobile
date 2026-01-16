@@ -8,7 +8,9 @@ abstract class EntityEvent extends Equatable {
 
 class GetTrackedEntityEvent extends EntityEvent {
   String programeId;
-  GetTrackedEntityEvent({required this.programeId});
+  bool filterLocal;
+  String? countryId;
+  GetTrackedEntityEvent({required this.programeId,this.filterLocal=false,this.countryId});
 
 }
 

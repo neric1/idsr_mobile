@@ -8,7 +8,9 @@ abstract class SignalEvent extends Equatable {
 
 class GetTrackedSignalEvent extends SignalEvent {
 String programeId;
-  GetTrackedSignalEvent({required this.programeId});
+bool filterLocal;
+String? countryId;
+  GetTrackedSignalEvent({required this.programeId,this.filterLocal=false,this.countryId});
 
 }
 

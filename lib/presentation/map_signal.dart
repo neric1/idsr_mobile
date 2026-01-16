@@ -5,18 +5,19 @@ import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:idsr/data/entity/models/tracked_entity.dart';
 import 'package:idsr/presentation/map_legend.dart';
+import 'package:idsr/presentation/map_signal_legend.dart';
 import 'package:idsr/utils/utils.dart';
 import 'package:latlong2/latlong.dart';
 const  removedCountry=[ "morocco","libya", "tunisia", "sudan", "egypt", "djibouti", "somalia","somaliland","w sahara"];
-class MyMapWidget extends StatefulWidget {
+class MyMapSignalWidget extends StatefulWidget {
   List<TrackedEntity> trackedEntity;
-  MyMapWidget({super.key,required this.trackedEntity});
+  MyMapSignalWidget({super.key,required this.trackedEntity});
 
   @override
-  State<MyMapWidget> createState() => _MyMapWidgetState();
+  State<MyMapSignalWidget> createState() => _MyMapSignaWidgetState();
 }
 
-class _MyMapWidgetState extends State<MyMapWidget> {
+class _MyMapSignaWidgetState extends State<MyMapSignalWidget> {
   final MapController _mapController = MapController();
   List<Polygon> polygons = [];
   List<Marker> markers = [];
@@ -84,9 +85,9 @@ class _MyMapWidgetState extends State<MyMapWidget> {
     _mapController.move(camera.center, newZoom);
   }
   Color colorForCount(int count) {
-    if (count >= 9) return  Colors.red.shade900;
-    if (count >= 6) return Colors.orange.shade900;
-    if (count >= 3) return Colors.orange.shade300;
+    if (count >= 90) return  Colors.red.shade900;
+    if (count >= 60) return Colors.orange.shade900;
+    if (count >= 30) return Colors.orange.shade300;
     if (count >= 1) return  Colors.yellow.shade200;
     return  Color(0xFF248f24);
   }
@@ -172,8 +173,6 @@ class _MyMapWidgetState extends State<MyMapWidget> {
     for (final feature in jsonData['features']) {
       final rawName = feature['properties']['name'];
       final name = normalizeCountryName(rawName);
-      print("object checkk");
-      print(name);
 
 
       final geometry = feature['geometry'];
@@ -267,7 +266,7 @@ class _MyMapWidgetState extends State<MyMapWidget> {
             mapController: _mapController,
             options: MapOptions(
               initialCenter: LatLng(0, 16),
-              initialZoom: 2.6,
+              initialZoom: 2.8,
               backgroundColor: Colors.black,
     interactionOptions: const InteractionOptions(
     flags: InteractiveFlag.none,
@@ -317,7 +316,7 @@ class _MyMapWidgetState extends State<MyMapWidget> {
         Positioned(
           bottom: 0,
           left: 0,
-          child:  MapLegend(),
+          child:  MapSignalLegend(),
         ),
       ],
     );
