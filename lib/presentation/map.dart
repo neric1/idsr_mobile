@@ -172,8 +172,7 @@ class _MyMapWidgetState extends State<MyMapWidget> {
     for (final feature in jsonData['features']) {
       final rawName = feature['properties']['name'];
       final name = normalizeCountryName(rawName);
-      print("object checkk");
-      print(name);
+
 
 
       final geometry = feature['geometry'];

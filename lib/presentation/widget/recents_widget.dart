@@ -6,7 +6,7 @@ import 'package:idsr/data/entity/models/tracked_entity.dart';
 import 'package:idsr/data/entity/models/tracked_entity.dart';
 import 'package:idsr/utils/utils.dart';
 
-Widget RecentsCard(List<TrackedEntity> trackedEntity) {
+Widget RecentsCard(List<TrackedEntity> trackedEntity,{required String title}) {
   final recent = filterByDays(trackedEntity, 100).take(5).toList();
   return Container(
     padding: const EdgeInsets.all(16),
@@ -24,7 +24,7 @@ Widget RecentsCard(List<TrackedEntity> trackedEntity) {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children:  [
-        Text("Recent Signals (${recent.length})", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18,color: Colors.white)),
+        Text("Recent $title (${recent.length})", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18,color: Colors.white)),
         SizedBox(height: 10),
         ListView.separated(
           itemCount: recent.length,

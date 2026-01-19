@@ -440,7 +440,7 @@ class _WhoAfrDashboardState extends State<WhoAfrDashboard>   with WidgetsBinding
                                       ),
                                     ),
                                     SizedBox(height: 20,),
-                                    RecentsCard(ongoing),
+                                    RecentsCard(ongoing,title: "Events"),
                                     const SizedBox(height: 90),
                                   ],
                                 );
@@ -545,7 +545,7 @@ class _WhoAfrDashboardState extends State<WhoAfrDashboard>   with WidgetsBinding
                               builder: (context,state) {
                               if(state is GetTrackedSignalCompleted){
                                   final trackedEntity=context.read<SignalBloc>().trackedEntity;
-                                   return RecentsCard(trackedEntity);}
+                                   return RecentsCard(trackedEntity,title: "Signals");}
 
                               return const Center(child: CircularProgressIndicator());
                                }
