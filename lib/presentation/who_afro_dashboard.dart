@@ -470,7 +470,8 @@ class _WhoAfrDashboardState extends State<WhoAfrDashboard>   with WidgetsBinding
                                    // print("object===");
                                    // print(trackedEntity.length);
                                    if(state is GetTrackedSignalCompleted){
-                                     final recents=filterByDays(trackedEntity, 14);
+                                     // final recents=filterByDays(trackedEntity, 14);
+                                     final recents=filterSortAndTake(trackedEntity, 14);
                                      return recents.isNotEmpty? InfiniteScrollRow(recents,"signal"):Offstage();
                                    }
                                    return const Center(child: CircularProgressIndicator());
@@ -483,8 +484,8 @@ class _WhoAfrDashboardState extends State<WhoAfrDashboard>   with WidgetsBinding
                                    if(state is GetTrackedSignalCompleted){
                                      final trackedEntity=context.read<SignalBloc>().trackedEntity;
 
-                                     final recents3d=filterByDays(trackedEntity, 3);
-                                     final recents7d=filterByDays(trackedEntity, 7);
+                                     final recents3d=filterSortAndTake(trackedEntity, 3);
+                                     final recents7d=filterSortAndTake(trackedEntity, 7);
                                      final underMonitoring= getUnderMonitoring(trackedEntity);
 
                                      return SizedBox(
@@ -545,7 +546,7 @@ class _WhoAfrDashboardState extends State<WhoAfrDashboard>   with WidgetsBinding
                               builder: (context,state) {
                               if(state is GetTrackedSignalCompleted){
                                   final trackedEntity=context.read<SignalBloc>().trackedEntity;
-                                   return RecentsCard(trackedEntity,title: "Signals");}
+                                   return RecentsCard(trackedEntity,title: "Signals",isSignal: true);}
 
                               return const Center(child: CircularProgressIndicator());
                                }
@@ -890,7 +891,8 @@ Widget _buildSignalCard(List<TrackedEntity> levels, String label,BuildContext co
           context.pushNamed(EVENT_DETAILS,
               extra: {
                 "event_name":label,
-                "event_list": levels
+                "event_list": levels,
+                "is_signal":true
               });
           // Navigator.push(
           //   context,

@@ -84,13 +84,34 @@ Map<String, dynamic> countByGrades(
     "gradedEntity":gradedEntity
   };
 }
-List<TrackedEntity> filterByDays(
-    List<TrackedEntity> list, int days
-    ) {
-  return list.where((item) {
-    final dt = DateTime.parse(item.created);
-    return DateTime.now().difference(dt).inHours <= days * 24;
-  }).toList();
+List<TrackedEntity> filterSortAndTake(
+    List<TrackedEntity> list,
+    int days, {
+      int? takeCount,
+    }) {
+  final now = DateTime.now();
+  final cutoff = now.subtract(Duration(days: days));
+
+  final filtered = <TrackedEntity>[];
+
+  for (final item in list) {
+    try {
+      final dt = DateTime.parse(item.created);
+
+      if (dt.isAfter(cutoff) && dt.isBefore(now)) {
+        filtered.add(item);
+      }
+    } catch (_) {}
+  }
+
+  filtered.sort((a, b) =>
+      DateTime.parse(b.created)
+          .compareTo(DateTime.parse(a.created)));
+
+  // If takeCount is null → return all
+  return takeCount == null
+      ? filtered
+      : filtered.take(takeCount).toList();
 }
 
 // List<TrackedEntity> filterByRecentEvent(

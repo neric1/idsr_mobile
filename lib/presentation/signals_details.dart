@@ -16,10 +16,16 @@ class _SignalsDetailsState extends State<SignalsDetails> {
    String? sname;
    String? notes;
    String? date;
+   TeiAttribute? moh;
+   TeiAttribute? wco;
+   TeiAttribute? afro;
+   TeiAttribute? start;
+   TeiAttribute? end;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    final entity=widget.trackedEntity;
     TeiAttribute?   eventNameAttribute = widget.trackedEntity.attributes.firstWhereOrNull(
           (attr) {
         return attr.displayName == "Event name" || attr.attribute == "LEAwqoW5Rtc";
@@ -32,6 +38,27 @@ class _SignalsDetailsState extends State<SignalsDetails> {
     );
     TeiAttribute?   dateattribute = widget.trackedEntity.attributes.firstWhereOrNull(
           (attr) =>  attr.attribute=="Zhmz8B6mqEx",
+      // orElse: () => null,
+    );
+      afro =entity.attributes.firstWhereOrNull(
+          (attr) => attr.attribute == "IXtYxqMzT6W" || attr.attribute=="Zhmz8B6mqEx",
+      // orElse: () => null,
+    );
+
+      moh =entity.attributes.firstWhereOrNull(
+          (attr) => attr.attribute == "XlwmaCnby7N" || attr.attribute=="Zhmz8B6mqEx",
+      // orElse: () => null,
+    );
+      wco =entity.attributes.firstWhereOrNull(
+          (attr) => attr.attribute == "iXgIrStuxGp" || attr.attribute=="Zhmz8B6mqEx",
+      // orElse: () => null,
+    );
+     start =entity.attributes.firstWhereOrNull(
+          (attr) => attr.attribute == "dbTjaIcldcW" || attr.attribute=="Zhmz8B6mqEx",
+      // orElse: () => null,
+    );
+      end =entity.attributes.firstWhereOrNull(
+          (attr) => attr.attribute == "T0JV2Bo3o2A" || attr.attribute=="Zhmz8B6mqEx",
       // orElse: () => null,
     );
 
@@ -90,11 +117,26 @@ class _SignalsDetailsState extends State<SignalsDetails> {
                   ),
                 ),
               ):Offstage(),
+              widget.type=="signal"?Offstage(): Column(
+                children: [
+                  InfoRow(label:"Date detected by MoH:" ,value: moh?.value,),
+                  SizedBox(height: 3),
+                  InfoRow(label:"Date notified to WCO:" ,value: wco?.value,),
+                  SizedBox(height: 3),
+                  InfoRow(label:"Date notified to AFRO:" ,value: afro?.value,),
+                  SizedBox(height: 3),
+                  InfoRow(label:"Start  of reporting period:" ,value: start?.value,),
+                  SizedBox(height: 3),
+                  InfoRow(label:"End of reporting period:" ,value: end?.value,),
+                  SizedBox(height: 6),
+                ],
+              )
+              ,
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: Text("Description:",style: TextStyle(fontWeight: FontWeight.bold),),
               ),
-              Container(
+             notes!=null? Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
@@ -105,12 +147,48 @@ class _SignalsDetailsState extends State<SignalsDetails> {
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Text("$notes"
+                  child: Text(notes!
                   ),
                 ),
-              )
+              ):Padding(
+               padding: const EdgeInsets.all(8.0),
+               child: Text("No Description",style: TextStyle(color: Colors.grey),),
+               ),
+
             ]),
         ))
       );
+  }
+}
+class InfoRow extends StatelessWidget {
+  final String label;
+  final String? value;
+
+  const InfoRow({
+    super.key,
+    required this.label,
+    this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Text(
+              label,
+              style: TextStyle(color: Colors.grey[700]),
+            ),
+          ),
+          Text(
+            value ?? "-",
+            style: const TextStyle(color: Colors.black,fontSize: 16,fontWeight: FontWeight.w600),
+          ),
+        ],
+      ),
+    );
   }
 }

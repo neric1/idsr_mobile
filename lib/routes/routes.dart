@@ -46,7 +46,9 @@ class Routes {
               as Map<String, dynamic>?)?["event_list"];
               final title = (state.extra
               as Map<String, dynamic>?)?["event_name"];
-              return  EventDetails(trackedEntities: grades,title: title,);}
+              final isSignal = (state.extra
+              as Map<String, dynamic>?)?["is_signal"];
+              return EventDetails(trackedEntities: grades,title: title,isSignal: isSignal??false,);}
         ),
         GoRoute(
             name: SIGNAL_DETAILS,

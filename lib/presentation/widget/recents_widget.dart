@@ -6,8 +6,8 @@ import 'package:idsr/data/entity/models/tracked_entity.dart';
 import 'package:idsr/data/entity/models/tracked_entity.dart';
 import 'package:idsr/utils/utils.dart';
 
-Widget RecentsCard(List<TrackedEntity> trackedEntity,{required String title}) {
-  final recent = filterByDays(trackedEntity, 100).take(5).toList();
+Widget RecentsCard(List<TrackedEntity> trackedEntity,{required String title,bool isSignal=false}) {
+  final recent = !isSignal?filterByRecentEvent(trackedEntity, 100).take(5).toList(): filterSortAndTake(trackedEntity, 100,takeCount: 5);
   return Container(
     padding: const EdgeInsets.all(16),
     decoration: BoxDecoration(
@@ -61,7 +61,7 @@ Widget RecentsCard(List<TrackedEntity> trackedEntity,{required String title}) {
                       ],
                     ),
                     Text("$eventdate",style: TextStyle(color: Colors.white.withValues(alpha: 0.5),fontSize: 11),),
-                    Text("$notes",style: TextStyle(color: Colors.white,fontSize: 11),),
+                    Text(notes??"--",style: TextStyle(color: Colors.white,fontSize: 11),),
 
                   ]
 
