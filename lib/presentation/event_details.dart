@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:idsr/data/entity/models/tracked_entity.dart';
+import 'package:idsr/presentation/widget/timeline.dart';
 
 class EventDetails extends StatelessWidget {
   final String title;
@@ -130,25 +131,27 @@ class EventDetails extends StatelessWidget {
                                    ),
                                  ),
                                 ],
-                              ):Column(
-                                children: [
-                                  InfoRow(label:"Date detected by MoH:" ,value: moh?.value,),
-                                  SizedBox(height: 3),
-                                  InfoRow(label:"Date notified to WCO:" ,value: wco?.value,),
-                                  SizedBox(height: 3),
-                                  InfoRow(label:"Date notified to AFRO:" ,value: afro?.value,),
-                                  SizedBox(height: 3),
-                                  InfoRow(label:"Start  of reporting period:" ,value: start?.value,),
-                                  SizedBox(height: 3),
-                                  InfoRow(label:"End of reporting period:" ,value: end?.value,),
-                                  SizedBox(height: 6),
-                                ],
-                              ),
+                              ):TimelineCard(valuemoh: moh?.value,valuewco: wco?.value,valuemafro: afro?.value,valuestart: start?.value,valueend: end?.value,),
+
+                              // Column(
+                              //   children: [
+                              //     InfoRow(label:"Date detected by MoH:" ,value: moh?.value,),
+                              //     SizedBox(height: 3),
+                              //     InfoRow(label:"Date notified to WCO:" ,value: wco?.value,),
+                              //     SizedBox(height: 3),
+                              //     InfoRow(label:"Date notified to AFRO:" ,value: afro?.value,),
+                              //     SizedBox(height: 3),
+                              //     InfoRow(label:"Start  of reporting period:" ,value: start?.value,),
+                              //     SizedBox(height: 3),
+                              //     InfoRow(label:"End of reporting period:" ,value: end?.value,),
+                              //     SizedBox(height: 6),
+                              //   ],
+                              // ),
 
 
                               Text(
                                 "Description:",
-                                style: TextStyle(color: Colors.grey[700]),
+                                style: TextStyle(fontSize:16,fontWeight: FontWeight.w600),
                               ),
                               Text(
                                 notes??"--",
