@@ -103,11 +103,12 @@ class _WhoAfrDashboardState extends State<WhoAfrDashboard>   with WidgetsBinding
   int isoweek=DateTime.now().weekOfYear;
   DateTime current=DateTime.now();
   DateTime? endDate;
+  DateTimeRange? rangeDate;
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-
+    rangeDate=DateTimeRange(start: Jiffy.parseFromDateTime(current).startOf(Unit.week).dateTime, end: Jiffy.parseFromDateTime(current).endOf(Unit.week).dateTime);
     _pageController = PageController();
   }
   final List<String> _tabs = ['Events', 'Signals'];
@@ -253,8 +254,8 @@ class _WhoAfrDashboardState extends State<WhoAfrDashboard>   with WidgetsBinding
                     borderRadius: BorderRadius.circular(5),),
                   child: Row(
                     children: [
-                    Text("Country:",style: TextStyle(fontSize: 15,fontWeight: FontWeight.w500),),
-                      SizedBox(width: 5,),
+                    // Text("Country:",style: TextStyle(fontSize: 15,fontWeight: FontWeight.w500),),
+                    //   SizedBox(width: 5,),
                       Flexible(
                         child: GestureDetector(
                           onTap: () async {
@@ -402,6 +403,31 @@ class _WhoAfrDashboardState extends State<WhoAfrDashboard>   with WidgetsBinding
 
                                     _buildQuickStats(),
                                     const SizedBox(height: 8),
+                                    // Center(child: Text("Tab a box to see detailed information")),
+                                    Center(
+                                      child: BlinkingText(),
+                                      // child: RichText(
+                                      //   text: TextSpan(
+                                      //     children: [
+                                      //       WidgetSpan(
+                                      //         alignment: PlaceholderAlignment.middle,
+                                      //         child: Icon(
+                                      //           Icons.info,
+                                      //           size: 16,
+                                      //         ),
+                                      //       ),
+                                      //       TextSpan(
+                                      //         text: " Tap a box to see detailed information.",
+                                      //         style: TextStyle(
+                                      //           color: Colors.black,
+                                      //           fontSize: 14,
+                                      //         ),
+                                      //       ),
+                                      //     ],
+                                      //   ),
+                                      // ),
+                                    ),
+                                    const SizedBox(height: 8),
                                     Container(
                                       // padding: EdgeInsets.all(8),
                                       decoration: BoxDecoration(
@@ -493,16 +519,16 @@ class _WhoAfrDashboardState extends State<WhoAfrDashboard>   with WidgetsBinding
                                        child: Row(
                                          children: [
                                            Expanded(
-                                             child: _buildSignalCard(trackedEntity, "All",context),
+                                             child: _buildSignalCard(trackedEntity, "All",context,color: Color(0xFFc2c2c2)),
                                            ),
                                            Expanded(
-                                             child: _buildSignalCard(recents3d, "Past 3d",context),
+                                             child: _buildSignalCard(recents3d, "Past 3d",context,color: Color(0xFFffb367)),
                                            ),
                                            Expanded(
-                                             child: _buildSignalCard(recents7d, "Past 7d",context),
+                                             child: _buildSignalCard(recents7d, "Past 7d",context,color: Color(0xFFcc6601)),
                                            ),
                                            Expanded(
-                                             child: _buildSignalCard(underMonitoring, "Under monitoring",context),
+                                             child: _buildSignalCard(underMonitoring, "Under monitoring",context,color: Color(0xFFcdcc00 )),
                                            ),
                                          ],
                                        ),
@@ -512,7 +538,8 @@ class _WhoAfrDashboardState extends State<WhoAfrDashboard>   with WidgetsBinding
 
                                  }
                              ),
-                             // const SizedBox(height: 14),
+                             const SizedBox(height: 14),
+                             Center(child: BlinkingText()),
                              // Padding(
                              //   padding: const EdgeInsets.only(top: 8.0,left: 8),
                              //   child: Text(
@@ -592,46 +619,63 @@ class _WhoAfrDashboardState extends State<WhoAfrDashboard>   with WidgetsBinding
           colorFilter: const ColorFilter.mode(Colors.blue, BlendMode.srcIn),
         ),
 
-        GestureDetector(
-          onTap: (){
-            showDialog(
-              context: context,
-              builder: (_) => WeekPickerPopup(
-                initialDate: current,
-                onSelected: (range,date) {
-                  // print('Week start: ${range.start}');
-                  // print('Week end: ${range.end}');
-                  setState(() {
-                    isoweek=range.end.weekOfYear;
-                    current=date;
-                    endDate=range.end;
-                  });
-                  final dateEnd=Jiffy.parseFromDateTime(range.end)
-                      .format(pattern: 'yyyy-MM-dd');
-                  context.read<SignalBloc>()
-                      .add(GetTrackedSignalEvent(programeId: 'E12ZY36aT08&attribute=Zhmz8B6mqEx:GE:2017-01-07:LE:$dateEnd'));
-                  context.read<EntityBloc>()
-                    .add(GetTrackedEntityEvent(programeId: 'bG3Arfj8AtF&attribute=IXtYxqMzT6W:GE:1999-12-25:LE:$dateEnd'));
-                },
+        Column(
+          children: [
+            GestureDetector(
+              onTap: (){
+                showDialog(
+                  context: context,
+                  builder: (_) => WeekPickerPopup(
+                    initialDate: current,
+                    onSelected: (range,date) {
+                      // print('Week start: ${range.start}');
+                      // print('Week end: ${range.end}');
+                      setState(() {
+                        isoweek=range.end.weekOfYear;
+                        current=date;
+                        endDate=range.end;
+                        rangeDate=range;
+                      });
+                      final dateEnd=Jiffy.parseFromDateTime(range.end)
+                          .format(pattern: 'yyyy-MM-dd');
+                      context.read<SignalBloc>()
+                          .add(GetTrackedSignalEvent(programeId: 'E12ZY36aT08&attribute=Zhmz8B6mqEx:GE:2017-01-07:LE:$dateEnd'));
+                      context.read<EntityBloc>()
+                        .add(GetTrackedEntityEvent(programeId: 'bG3Arfj8AtF&attribute=IXtYxqMzT6W:GE:1999-12-25:LE:$dateEnd'));
+                    },
+                  ),
+                );
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: Color(0xFF4287f5),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child:  Text(
+                  "Epi Week $isoweek, ${rangeDate!.end.year}",
+                  style: TextStyle(color: Colors.white,fontSize: 15),
+                ),
               ),
-            );
-          },
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-            decoration: BoxDecoration(
-              color: Color(0xFF4287f5),
-              borderRadius: BorderRadius.circular(14),
             ),
-            child:  Text(
-              "Epi Week $isoweek, 2025",
-              style: TextStyle(color: Colors.white,fontSize: 15),
-            ),
-          ),
+            rangeDate!=null?Text(getWeekRangeText(rangeDate!.start,rangeDate!.end),style: TextStyle(fontSize: 12, color: Colors.black,fontWeight: FontWeight.w400),):Offstage()
+          ],
         ),
       ],
     );
   }
+  String getWeekRangeText(DateTime start, DateTime end) {
 
+    // If same month
+    if (start.month == end.month && start.year == end.year) {
+      return " ${start.day} - ${end.day} "
+          "${Jiffy.parseFromDateTime(end).format(pattern: "MMM yyyy")}";
+    }
+
+    // If different month or year
+    return "${Jiffy.parseFromDateTime(start).format(pattern: "d MMM")} "
+        "- ${Jiffy.parseFromDateTime(end).format(pattern: "d MMM yyyy")}";
+  }
   Widget _buildQuickStats() {
     return Container(
       // padding: EdgeInsets.all(8),
@@ -654,7 +698,7 @@ class _WhoAfrDashboardState extends State<WhoAfrDashboard>   with WidgetsBinding
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _statCard(context,"New Events", recent, [Color(0xFF4287f5),Color(0xFF4287f5)]),//nb
+                    _statCard(context,"New", recent, [Color(0xFF4287f5),Color(0xFF4287f5)]),//nb
                     _statCard(context,"Ongoing ", ongoing, [Color(0xFF4287f5),Color(0xFF4287f5)]),
                     _statCard(context,"Outbreaks", data[0], [Color(0xFF4287f5),Color(0xFF4287f5)]),
                     _statCard(context,"Humanitarian",data[1], [Color(0xFF4287f5),Color(0xFF4287f5)]),
@@ -670,7 +714,7 @@ class _WhoAfrDashboardState extends State<WhoAfrDashboard>   with WidgetsBinding
 
   Widget _statCard(BuildContext context,String title, List<TrackedEntity> levels, List<Color> color) {
     return Expanded(
-      child: GestureDetector(
+      child: InkWell(
         onTap: (){
           context.pushNamed(EVENT_DETAILS,
               extra: {
@@ -687,19 +731,27 @@ class _WhoAfrDashboardState extends State<WhoAfrDashboard>   with WidgetsBinding
           padding: const EdgeInsets.all(5),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(5),
+            // color: Colors.white,
             gradient: LinearGradient(
               begin: Alignment.bottomCenter,
                 end: Alignment.topCenter,
               colors: color,
             ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.5),
+                blurRadius: 6,
+                offset: const Offset(0, 3),
+              ),
+            ],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              AutoSizeText(
+              Text(
                 title,
                 maxLines: 1,
-                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
+                style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white),
               ),
               const SizedBox(height: 10),
               Text(levels.length.toString(), style: const TextStyle(color: Colors.white, fontSize: 20,fontWeight: FontWeight.bold),textAlign: TextAlign.center,),
@@ -884,7 +936,7 @@ EventItem? getLastEvent(Enrollment? enrollment) {
   return events.isNotEmpty ? events.last : null;
 
 }
-Widget _buildSignalCard(List<TrackedEntity> levels, String label,BuildContext context) {
+Widget _buildSignalCard(List<TrackedEntity> levels, String label,BuildContext context,{Color color=const  Color(0xFFF3C3A3)}) {
   return
       GestureDetector(
         onTap: (){
@@ -904,13 +956,19 @@ Widget _buildSignalCard(List<TrackedEntity> levels, String label,BuildContext co
       padding: const EdgeInsets.all(5),
       width: double.infinity,
       decoration: BoxDecoration(
-        color: const  Color(0xFFF3C3A3),
+        color: color,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
           color: Colors.grey,
           width: 1,
         ),
-
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.5),
+            blurRadius: 6,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -958,3 +1016,65 @@ List<TrackedEntity> getUnderMonitoring(List<TrackedEntity> trackedEntity) {
   return ongoingEvents;
 }
 
+
+class BlinkingText extends StatefulWidget {
+
+
+  const BlinkingText({
+    super.key,
+  });
+
+  @override
+  State<BlinkingText> createState() => _BlinkingTextState();
+}
+
+class _BlinkingTextState extends State<BlinkingText>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+      lowerBound: 0.4,
+      upperBound: 1.0,
+    )..repeat(reverse: true); // 🔥 infinite blinking
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose(); // very important
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: _controller,
+      child: RichText(
+        text: TextSpan(
+          children: [
+            WidgetSpan(
+              alignment: PlaceholderAlignment.middle,
+              child: Icon(
+                Icons.info,
+                size: 16,
+                color: Colors.red,
+              ),
+            ),
+            TextSpan(
+              text: " Tap a box to see detailed information.",
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

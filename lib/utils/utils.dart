@@ -202,3 +202,9 @@ String getCountryNameOnMap(String countryId, String name) {
 
   return (year: isoYear, week: week);
 }
+bool isWithinLastDays(DateTime date,int mdays) {
+  final now = DateTime.now();
+  final start = now.subtract( Duration(days: mdays));
+
+  return !date.isBefore(start) && !date.isAfter(now);
+}

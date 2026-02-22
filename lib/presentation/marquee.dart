@@ -73,7 +73,6 @@ class _InfiniteScrollRowState extends State<InfiniteScrollRow> {
   @override
   Widget build(BuildContext context) {
     // Duplicate the list to make looping smooth
-    final extendedColors = [...colors, ...colors];
 
     return SizedBox(
       height: 20,
@@ -92,7 +91,7 @@ class _InfiniteScrollRowState extends State<InfiniteScrollRow> {
           return InkWell(
             onTap: () {
               // Handle click, for example, show a dialog or navigate
-              print('Tapped on: $eventname');
+              // print('Tapped on: $eventname');
               context.pushNamed(SIGNAL_DETAILS,
                   extra: {
                     "entity": widget.trackedEntity[index],

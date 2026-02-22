@@ -52,12 +52,12 @@ class TimelineCard extends StatelessWidget {
             dotColor: Colors.green,
           ),
           TimelineItem(
-            title: "Reporting Period Started",
+            title: "Start of reporting period",
             date: valuestart??"",
             dotColor: Colors.blue,
           ),
           TimelineItem(
-            title: "Reporting Period Ended",
+            title: "End of reporting period",
             date: valueend??"",
             dotColor: Colors.red,
             isLast: true,

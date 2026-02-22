@@ -50,23 +50,43 @@ Widget RecentsCard(List<TrackedEntity> trackedEntity,{required String title,bool
             final eventname=eventNameAttribute?.value;
             final notes=eventNoteAttribute?.value;
             return  Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
                   children: [
-                    Row(
-                      children: [
-                        Expanded(child: Text("$eventname | ${enrollment.orgUnitName}",style: TextStyle(color: Colors.white,fontWeight:FontWeight.w600,fontSize: 14),)),
+                    Expanded(child: Container(
+                      padding: EdgeInsets.all( isWithinLastDays(DateTime.parse(eventdate!),14)? 10:0),
+            decoration: isWithinLastDays(DateTime.parse(eventdate!),14)?BoxDecoration(
+              color: Colors.red,
+              borderRadius: BorderRadius.circular(10), // rounded corners
+            ):null,
 
-                      ],
-                    ),
+            child: Text("$eventname | ${enrollment.orgUnitName}",style: TextStyle(color: Colors.white,fontWeight:FontWeight.w600,fontSize: 14),))),
+
+                  ],
+                ),
+                Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween
+                  ,
+                  children: [
                     Text("$eventdate",style: TextStyle(color: Colors.white.withValues(alpha: 0.5),fontSize: 11),),
-                    Text(notes??"--",style: TextStyle(color: Colors.white,fontSize: 11),),
+                    isWithinLastDays(DateTime.parse(eventdate!),14)?
+                    Container(
+                        padding: EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(10), // rounded corners
+                        ),child: Text("New",style: TextStyle(color: Colors.white,fontSize: 11,fontWeight: FontWeight.bold),)):Offstage()
+                  ],
+                ),
+                Text(notes??"--",textAlign: TextAlign.justify,style: TextStyle(color: Colors.white,fontSize: 11),),
 
-                  ]
+              ]
 
-              ),
-            );
+                            ),
+                          );
           }, separatorBuilder: (BuildContext context, int index) {
           return Center(child: SizedBox(
               width: MediaQuery.of(context).size.width,

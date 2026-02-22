@@ -5,6 +5,7 @@ import 'package:idsr/application/entity/entity_bloc.dart';
 import 'package:idsr/dependency_injector.dart';
 import 'package:idsr/presentation/home_page.dart';
 import 'package:idsr/routes/routes.dart';
+import 'package:jiffy/jiffy.dart';
 
 import 'application/signals/signal_bloc.dart';
 
@@ -12,7 +13,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await dotenv.load(fileName: ".env");
-
+  await Jiffy.setLocale('en_GB');
   init();
   await injector.allReady();
   runApp(const MyApp());
