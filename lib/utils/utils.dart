@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:idsr/data/entity/models/tracked_entity.dart';
+import 'package:week_of_year/date_week_extensions.dart';
 
 Map<String, dynamic> countByGrades(
     List<TrackedEntity>? statsData,
@@ -207,4 +208,18 @@ bool isWithinLastDays(DateTime date,int mdays) {
   final start = now.subtract( Duration(days: mdays));
 
   return !date.isBefore(start) && !date.isAfter(now);
+}
+
+
+String getPreviousWeek(String weekStr) {
+  final parts = weekStr.split('W');
+  int year = int.parse(parts[0]);
+  int week = int.parse(parts[1]);
+
+  DateTime date = DateTime(year, 1, 1)
+      .add(Duration(days: (week - 1) * 7));
+
+  DateTime prev = date.subtract(const Duration(days: 7));
+
+  return '${prev.year}W${prev.weekOfYear.toString().padLeft(2, '0')}';
 }

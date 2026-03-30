@@ -184,65 +184,65 @@ class _WhoAfrDashboardState extends State<WhoAfrDashboard>   with WidgetsBinding
   Widget build(BuildContext context) {
     return Scaffold(
             backgroundColor: const Color(0xFFececec),
-            appBar: AppBar(
-              elevation: 0,
-              title:
-            _buildHeader(context) ,
-            actions: [
-
-              GestureDetector(
-                  onTap: (){
-                    final dateEnd=endDate!=null?Jiffy.parseFromDateTime(endDate!)
-                        .format(pattern: 'yyyy-MM-dd'):Jiffy.parseFromDateTime(current)
-                        .format(pattern: 'yyyy-MM-dd');
-                    context.read<SignalBloc>()
-                        .add(GetTrackedSignalEvent(programeId: 'E12ZY36aT08&attribute=Zhmz8B6mqEx:GE:2017-01-07:LE:$dateEnd'));
-                    context.read<EntityBloc>()
-                        .add(GetTrackedEntityEvent(programeId: 'bG3Arfj8AtF&attribute=IXtYxqMzT6W:GE:1999-12-25:LE:$dateEnd'));
-
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 18.0),
-                    child: Icon(Icons.sync,color: Colors.red,),
-                  )),
-
-
-            //   IconButton(
-            //   icon: const Icon(Icons.filter_list),
-            //   onPressed: () {
-            //     // Example: show a bottom sheet for filters
-            //     showModalBottomSheet(
-            //       isScrollControlled: true,
-            //       context: context,
-            //       shape: const RoundedRectangleBorder(
-            //         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-            //       ),
-            //       builder: (context) =>  SizedBox(
-            //           height: MediaQuery.of(context).size.height * 0.9,
-            //           width: double.infinity,
-            //           child:SingleChildScrollView(child: FilterScreenUI())
-            //         // Column(
-            //         //   children: [
-            //         //     Padding(
-            //         //       padding: const EdgeInsets.all(8.0),
-            //         //       child: Text(
-            //         //         "Filters",
-            //         //         style: TextStyle(
-            //         //           fontSize: 18,
-            //         //           fontWeight: FontWeight.w600,
-            //         //           color: Colors.black,
-            //         //         ),
-            //         //         textAlign: TextAlign.center,
-            //         //       ),
-            //         //     ),
-            //         //   ],
-            //         // ),
-            //       ),
-            //     );
-            //   },
+            // appBar: AppBar(
+            //   elevation: 0,
+            //   title:
+            // _buildHeader(context) ,
+            // actions: [
+            //
+            //   GestureDetector(
+            //       onTap: (){
+            //         final dateEnd=endDate!=null?Jiffy.parseFromDateTime(endDate!)
+            //             .format(pattern: 'yyyy-MM-dd'):Jiffy.parseFromDateTime(current)
+            //             .format(pattern: 'yyyy-MM-dd');
+            //         context.read<SignalBloc>()
+            //             .add(GetTrackedSignalEvent(programeId: 'E12ZY36aT08&attribute=Zhmz8B6mqEx:GE:2017-01-07:LE:$dateEnd'));
+            //         context.read<EntityBloc>()
+            //             .add(GetTrackedEntityEvent(programeId: 'bG3Arfj8AtF&attribute=IXtYxqMzT6W:GE:1999-12-25:LE:$dateEnd'));
+            //
+            //       },
+            //       child: Padding(
+            //         padding: const EdgeInsets.only(right: 18.0),
+            //         child: Icon(Icons.sync,color: Colors.red,),
+            //       )),
+            //
+            //
+            // //   IconButton(
+            // //   icon: const Icon(Icons.filter_list),
+            // //   onPressed: () {
+            // //     // Example: show a bottom sheet for filters
+            // //     showModalBottomSheet(
+            // //       isScrollControlled: true,
+            // //       context: context,
+            // //       shape: const RoundedRectangleBorder(
+            // //         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            // //       ),
+            // //       builder: (context) =>  SizedBox(
+            // //           height: MediaQuery.of(context).size.height * 0.9,
+            // //           width: double.infinity,
+            // //           child:SingleChildScrollView(child: FilterScreenUI())
+            // //         // Column(
+            // //         //   children: [
+            // //         //     Padding(
+            // //         //       padding: const EdgeInsets.all(8.0),
+            // //         //       child: Text(
+            // //         //         "Filters",
+            // //         //         style: TextStyle(
+            // //         //           fontSize: 18,
+            // //         //           fontWeight: FontWeight.w600,
+            // //         //           color: Colors.black,
+            // //         //         ),
+            // //         //         textAlign: TextAlign.center,
+            // //         //       ),
+            // //         //     ),
+            // //         //   ],
+            // //         // ),
+            // //       ),
+            // //     );
+            // //   },
+            // // ),
+            // ],
             // ),
-            ],
-            ),
             body: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

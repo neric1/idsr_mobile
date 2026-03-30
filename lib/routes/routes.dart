@@ -24,7 +24,7 @@ class Routes {
 
         builder: (context, state) {
 
-        return  WhoAfrDashboard();}
+        return  HomePage();}
         ),
         GoRoute(
             name: GRADE_DETAILS,

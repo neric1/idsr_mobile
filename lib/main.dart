@@ -7,6 +7,7 @@ import 'package:idsr/presentation/home_page.dart';
 import 'package:idsr/routes/routes.dart';
 import 'package:jiffy/jiffy.dart';
 
+import 'application/idsr/threshold_bloc.dart';
 import 'application/signals/signal_bloc.dart';
 
 Future<void> main() async {
@@ -32,7 +33,10 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context) => SignalBloc(entityRepository: injector())),
     BlocProvider(create: (context) => EntityBloc(
     entityRepository: injector(),
-    )),],
+    )),BlocProvider(
+    create: (context) => ThresholdBloc(repository:injector()))
+
+          ,],
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
