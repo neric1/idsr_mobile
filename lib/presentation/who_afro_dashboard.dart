@@ -10,8 +10,11 @@ import 'package:idsr/application/entity/entity_state.dart';
 import 'package:idsr/application/signals/signal_bloc.dart';
 import 'package:idsr/application/signals/signal_event.dart';
 import 'package:idsr/application/signals/signal_state.dart';
+import 'package:idsr/application/user/user_bloc.dart';
+import 'package:idsr/application/user/user_state.dart';
 import 'package:idsr/data/entity/models/tracked_entity.dart';
 import 'package:idsr/dependency_injector.dart';
+import 'package:idsr/presentation/auth/login_screen.dart';
 import 'package:idsr/presentation/chart.dart';
 import 'package:idsr/presentation/grade_details.dart';
 import 'package:idsr/presentation/map.dart';
@@ -20,6 +23,7 @@ import 'package:idsr/presentation/marquee.dart';
 import 'package:idsr/presentation/week_picker.dart';
 import 'package:idsr/presentation/widget/recents_widget.dart';
 import 'package:idsr/routes/routes_name.dart';
+import 'package:idsr/session_hive.dart';
 import 'package:idsr/utils/utils.dart';
 import 'package:intl/intl.dart';
 import 'package:jiffy/jiffy.dart';
@@ -125,7 +129,11 @@ class _WhoAfrDashboardState extends State<WhoAfrDashboard>   with WidgetsBinding
     super.dispose();
   }
 
-  void _onTabTap(int index) {
+  void _onTabTap(int index,BuildContext c) {
+    if (index==1 && !Session.isLoggedIn){
+      showCustomBottomSheet(c);
+      return;
+    }
     _pageController.animateToPage(
       index,
       duration: const Duration(milliseconds: 250),
@@ -243,348 +251,352 @@ class _WhoAfrDashboardState extends State<WhoAfrDashboard>   with WidgetsBinding
             // // ),
             // ],
             // ),
-            body: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(height: 5,),
-                Container(
-                  padding: EdgeInsets.symmetric(vertical: 15,horizontal: 16),
-                  decoration: BoxDecoration(
-                    // color: Color(0xFF28283a),
-                    borderRadius: BorderRadius.circular(5),),
-                  child: Row(
-                    children: [
-                    // Text("Country:",style: TextStyle(fontSize: 15,fontWeight: FontWeight.w500),),
-                    //   SizedBox(width: 5,),
-                      Flexible(
-                        child: GestureDetector(
-                          onTap: () async {
-                           final result=await _openCountryPicker();
-                           if (result != null) {
-                             setState(() => selectedCountry = result);
-                             if(!mounted)return;
+            body: BlocListener(
+              bloc: context.read<UserBloc>(),
+              listener: (context, state) {
+                if (state is GetUserCompleted) {
+                  _pageController.animateToPage(
+                    1,
+                    duration: const Duration(milliseconds: 250),
+                    curve: Curves.easeOut,
+                  );
+                }else{
+                  _pageController.animateToPage(
+                    0,
+                    duration: const Duration(milliseconds: 250),
+                    curve: Curves.easeOut,
+                  );
+                }
+              },
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 5,),
+                  Container(
+                    padding: EdgeInsets.symmetric(vertical: 15,horizontal: 16),
+                    decoration: BoxDecoration(
+                      // color: Color(0xFF28283a),
+                      borderRadius: BorderRadius.circular(5),),
+                    child: Row(
+                      children: [
+                      // Text("Country:",style: TextStyle(fontSize: 15,fontWeight: FontWeight.w500),),
+                      //   SizedBox(width: 5,),
+                        Flexible(
+                          child: GestureDetector(
+                            onTap: () async {
+                             final result=await _openCountryPicker();
+                             if (result != null) {
+                               setState(() => selectedCountry = result);
+                               if(!mounted)return;
 
-                             context.read<SignalBloc>()
-                                 .add(GetTrackedSignalEvent(programeId: 'E12ZY36aT08',filterLocal: true,countryId: result.id));
-                             context.read<EntityBloc>()
-                                 .add(GetTrackedEntityEvent(programeId: 'bG3Arfj8AtF',filterLocal: true,countryId: result.id));
-                           }
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16,),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: Colors.grey),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Flexible(
-                                  child: Text(
-                                    selectedCountry?.name ?? 'Select Country',
-                                    style: const TextStyle(fontSize: 16),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                const Icon(Icons.keyboard_arrow_down),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ))
-                  // Text("Country: Ethiopia",style: TextStyle(fontSize: 15,fontWeight: FontWeight.w500),))
-                ,
-                /// Tab Bar
-                Container(
-                  height: 33,
-                  margin: const EdgeInsets.symmetric(horizontal: 16),
-                  // padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade300,
-                    borderRadius: BorderRadius.circular(24),
-                  ),
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      final tabWidth = constraints.maxWidth / _tabs.length;
-
-                      return Stack(
-                        children: [
-                          /// Indicator
-                          AnimatedPositioned(
-                            duration: const Duration(milliseconds: 220),
-                            curve: Curves.easeOut,
-                            left: tabWidth * _selectedIndex,
-                            top: 0,
-                            bottom: 0,
-                            width: tabWidth,
+                               context.read<SignalBloc>()
+                                   .add(GetTrackedSignalEvent(programeId: 'E12ZY36aT08',filterLocal: true,countryId: result.id));
+                               context.read<EntityBloc>()
+                                   .add(GetTrackedEntityEvent(programeId: 'bG3Arfj8AtF',filterLocal: true,countryId: result.id));
+                             }
+                            },
                             child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 16,),
                               decoration: BoxDecoration(
-                                color:  Color(0xFF4287f5),
-                                borderRadius: BorderRadius.circular(20),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: Colors.grey),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Flexible(
+                                    child: Text(
+                                      selectedCountry?.name ?? 'Select Country',
+                                      style: const TextStyle(fontSize: 16),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  const Icon(Icons.keyboard_arrow_down),
+                                ],
                               ),
                             ),
                           ),
+                        ),
+                      ],
+                    ))
+                    // Text("Country: Ethiopia",style: TextStyle(fontSize: 15,fontWeight: FontWeight.w500),))
+                  ,
+                  /// Tab Bar
+                  Container(
+                    height: 33,
+                    margin: const EdgeInsets.symmetric(horizontal: 16),
+                    // padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade300,
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        final tabWidth = constraints.maxWidth / _tabs.length;
 
-                          /// Tabs
-                          Row(
-                            children: List.generate(_tabs.length, (index) {
-                              final isActive = index == _selectedIndex;
+                        return Stack(
+                          children: [
+                            /// Indicator
+                            AnimatedPositioned(
+                              duration: const Duration(milliseconds: 220),
+                              curve: Curves.easeOut,
+                              left: tabWidth * _selectedIndex,
+                              top: 0,
+                              bottom: 0,
+                              width: tabWidth,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color:  Color(0xFF2196f3),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                              ),
+                            ),
 
-                              return Expanded(
-                                child: GestureDetector(
-                                  behavior: HitTestBehavior.opaque,
-                                  onTap: () => _onTabTap(index),
-                                  child: Center(
-                                    child: AnimatedDefaultTextStyle(
-                                      duration: const Duration(milliseconds: 180),
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: isActive
-                                            ? FontWeight.w600
-                                            : FontWeight.w500,
-                                        color: isActive
-                                            ? Colors.white
-                                            : Colors.grey.shade700,
+                            /// Tabs
+                            Row(
+                              children: List.generate(_tabs.length, (index) {
+                                final isActive = index == _selectedIndex;
+
+                                return Expanded(
+                                  child: GestureDetector(
+                                    behavior: HitTestBehavior.opaque,
+                                    onTap: () => _onTabTap(index,context),
+                                    child: Center(
+                                      child: AnimatedDefaultTextStyle(
+                                        duration: const Duration(milliseconds: 180),
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: isActive
+                                              ? FontWeight.w600
+                                              : FontWeight.w500,
+                                          color: isActive
+                                              ? Colors.white
+                                              : Colors.grey.shade700,
+                                        ),
+                                        child: Text(_tabs[index]),
                                       ),
-                                      child: Text(_tabs[index]),
                                     ),
                                   ),
-                                ),
-                              );
-                            }),
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-                ),
-
-                const SizedBox(height: 10),
-
-                /// PageView
-                Expanded(
-                  child: PageView(
-                    controller: _pageController,
-                    onPageChanged: (index) {
-                      setState(() => _selectedIndex = index);
-                    },
-                    children: [
-
-                    SafeArea(
-                      child: SingleChildScrollView(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                          child: BlocBuilder<EntityBloc, EntityState>(
-                              builder: (context,mstate) {
-                                // final mstate=context.read<EntityBloc>().state;
-                                if(mstate is GetTrackedEntityLoading){
-                                  return const Center(child: CircularProgressIndicator());
-                                }
-                                // final trackedEntity=context.read<EntityBloc>().trackedEntity;
-                                //)
-
-                                final trackedEntity=context.read<EntityBloc>().trackedEntity;
-                                final ongoing= getOngoing(trackedEntity);
-                                final grade3= countByGrades(ongoing,"Grade 3",dataElement: "swCuEaReUQr");
-                                final grade2= countByGrades(ongoing,"Grade 2",dataElement: "swCuEaReUQr");
-                                final grade1= countByGrades(ongoing,"Grade 1",dataElement: "swCuEaReUQr");
-                                final ungraded= countByGrades(ongoing,"Ungraded",dataElement: "swCuEaReUQr");
-
-                                final p3= countByGrades(ongoing,"Protracted3",dataElement: "swCuEaReUQr");
-                                final p2= countByGrades(ongoing,"Protracted2",dataElement: "swCuEaReUQr");
-                                final p1= countByGrades(ongoing,"Protracted1",dataElement: "swCuEaReUQr");
-
-                                return Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-
-                                    _buildQuickStats(),
-                                    const SizedBox(height: 8),
-                                    // Center(child: Text("Tab a box to see detailed information")),
-                                    Center(
-                                      child: BlinkingText(),
-                                      // child: RichText(
-                                      //   text: TextSpan(
-                                      //     children: [
-                                      //       WidgetSpan(
-                                      //         alignment: PlaceholderAlignment.middle,
-                                      //         child: Icon(
-                                      //           Icons.info,
-                                      //           size: 16,
-                                      //         ),
-                                      //       ),
-                                      //       TextSpan(
-                                      //         text: " Tap a box to see detailed information.",
-                                      //         style: TextStyle(
-                                      //           color: Colors.black,
-                                      //           fontSize: 14,
-                                      //         ),
-                                      //       ),
-                                      //     ],
-                                      //   ),
-                                      // ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Container(
-                                      // padding: EdgeInsets.all(8),
-                                      decoration: BoxDecoration(
-                                        // color: Color(0xFF28283a),
-                                        borderRadius: BorderRadius.circular(5),),
-                                      child: Column(
-                                        children: [
-                                          Row(
-                                            children: [
-                                              gradeCard(context,grade3,"G3",const Color(0xFFFF2E2E)),
-                                              gradeCard(context,grade2,"G2",const Color(0xFFFF7A7A)),
-                                              gradeCard(context,grade1,"G1",const Color(0xFFFFD6D6)),
-                                              gradeCard(context,ungraded,"UG",const Color(0xFF4A4F58),txtColor: Colors.white)
-                                            ],
-                                          ),
-                                          Row(
-                                            children: [
-                                              gradeCard(context,p3,"P3",const Color(0xFFE78A52)),
-                                              gradeCard(context,p2,"P2",const  Color(0xFFF3C3A3)),
-                                              gradeCard(context,p1,"P1",const Color(0xFFF7E9D4)),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-
-                                    const SizedBox(height: 8),
-                                    SizedBox(
-                                      height: 350,
-                                      child: Builder(
-                                          builder: (context) {
-                                            final trackedEntity=context.read<EntityBloc>().trackedEntity;
-                                            final ongoing= getOngoing(trackedEntity);
-                                            return MyMapWidget(trackedEntity: ongoing);
-                                          }
-                                      ),
-                                    ),
-                                    SizedBox(height: 20,),
-                                    RecentsCard(ongoing,title: "Events"),
-                                    const SizedBox(height: 90),
-                                  ],
                                 );
-                              }
+                              }),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  /// PageView
+                  Expanded(
+                    child: PageView(
+                      controller: _pageController,
+                      onPageChanged: (index) {
+                        setState(() => _selectedIndex = index);
+                      },
+                      children: [
+
+                      SafeArea(
+                        child: SingleChildScrollView(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                            child: BlocBuilder<EntityBloc, EntityState>(
+                                builder: (context,mstate) {
+                                  // final mstate=context.read<EntityBloc>().state;
+                                  if(mstate is GetTrackedEntityLoading){
+                                    return const Center(child: CircularProgressIndicator());
+                                  }
+                                  // final trackedEntity=context.read<EntityBloc>().trackedEntity;
+                                  //)
+
+                                  final trackedEntity=context.read<EntityBloc>().trackedEntity;
+                                  final ongoing= getOngoing(trackedEntity);
+                                  final grade3= countByGrades(ongoing,"Grade 3",dataElement: "swCuEaReUQr");
+                                  final grade2= countByGrades(ongoing,"Grade 2",dataElement: "swCuEaReUQr");
+                                  final grade1= countByGrades(ongoing,"Grade 1",dataElement: "swCuEaReUQr");
+                                  final ungraded= countByGrades(ongoing,"Ungraded",dataElement: "swCuEaReUQr");
+
+                                  final p3= countByGrades(ongoing,"Protracted3",dataElement: "swCuEaReUQr");
+                                  final p2= countByGrades(ongoing,"Protracted2",dataElement: "swCuEaReUQr");
+                                  final p1= countByGrades(ongoing,"Protracted1",dataElement: "swCuEaReUQr");
+
+                                  return Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+
+                                      _buildQuickStats(),
+                                      const SizedBox(height: 8),
+                                      // Center(child: Text("Tab a box to see detailed information")),
+                                      Center(
+                                        child: BlinkingText(),
+
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Container(
+                                        // padding: EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          // color: Color(0xFF28283a),
+                                          borderRadius: BorderRadius.circular(5),),
+                                        child: Column(
+                                          children: [
+                                            Row(
+                                              children: [
+                                                gradeCard(context,grade3,"G3",const Color(0xFFFF2E2E)),
+                                                gradeCard(context,grade2,"G2",const Color(0xFFFF7A7A)),
+                                                gradeCard(context,grade1,"G1",const Color(0xFFFFD6D6)),
+                                                gradeCard(context,ungraded,"UG",const Color(0xFF4A4F58),txtColor: Colors.white)
+                                              ],
+                                            ),
+                                            Row(
+                                              children: [
+                                                gradeCard(context,p3,"P3",const Color(0xFFE78A52)),
+                                                gradeCard(context,p2,"P2",const  Color(0xFFF3C3A3)),
+                                                gradeCard(context,p1,"P1",const Color(0xFFF7E9D4)),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+
+                                      const SizedBox(height: 8),
+                                      SizedBox(
+                                        height: 350,
+                                        child: Builder(
+                                            builder: (context) {
+                                              final trackedEntity=context.read<EntityBloc>().trackedEntity;
+                                              final ongoing= getOngoing(trackedEntity);
+                                              return MyMapWidget(trackedEntity: ongoing);
+                                            }
+                                        ),
+                                      ),
+                                      SizedBox(height: 20,),
+                                      RecentsCard(ongoing,title: "Events"),
+                                      const SizedBox(height: 90),
+                                    ],
+                                  );
+                                }
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                     SafeArea(child: SingleChildScrollView(
-                       child: Padding(
-                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                         child: Column(
-                           crossAxisAlignment: CrossAxisAlignment.start,
-                           children: [
-                             // Padding(
-                             //   padding: const EdgeInsets.all(8.0),
-                             //   child: Text(
-                             //     "Signals",
-                             //     style: TextStyle(fontSize: 18,fontWeight: FontWeight.w700,color: Colors.black),
-                             //   ),
-                             // ),
-                             BlocBuilder(
-                                 bloc: context.read<SignalBloc>(),
-                                 builder: (context,state) {
+                       SafeArea(child: SingleChildScrollView(
+                         child: Padding(
+                           padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                           child: Column(
+                             crossAxisAlignment: CrossAxisAlignment.start,
+                             children: [
+                               // Padding(
+                               //   padding: const EdgeInsets.all(8.0),
+                               //   child: Text(
+                               //     "Signals",
+                               //     style: TextStyle(fontSize: 18,fontWeight: FontWeight.w700,color: Colors.black),
+                               //   ),
+                               // ),
+                               BlocBuilder(
+                                   bloc: context.read<SignalBloc>(),
+                                   builder: (context,state) {
 
-                                   final trackedEntity=context.read<SignalBloc>().trackedEntity;
-                                   // print("object===");
-                                   // print(trackedEntity.length);
-                                   if(state is GetTrackedSignalCompleted){
-                                     // final recents=filterByDays(trackedEntity, 14);
-                                     final recents=filterSortAndTake(trackedEntity, 14);
-                                     return recents.isNotEmpty? InfiniteScrollRow(recents,"signal"):Offstage();
-                                   }
-                                   return const Center(child: CircularProgressIndicator());
-                                 }
-                             ),
-                             SizedBox(height: 10,),
-                             BlocBuilder(
-                                 bloc: context.read<SignalBloc>(),
-                                 builder: (context,state) {
-                                   if(state is GetTrackedSignalCompleted){
                                      final trackedEntity=context.read<SignalBloc>().trackedEntity;
-
-                                     final recents3d=filterSortAndTake(trackedEntity, 3);
-                                     final recents7d=filterSortAndTake(trackedEntity, 7);
-                                     final underMonitoring= getUnderMonitoring(trackedEntity);
-
-                                     return SizedBox(
-                                       height: 80,
-                                       child: Row(
-                                         children: [
-                                           Expanded(
-                                             child: _buildSignalCard(trackedEntity, "All",context,color: Color(0xFFc2c2c2)),
-                                           ),
-                                           Expanded(
-                                             child: _buildSignalCard(recents3d, "Past 3d",context,color: Color(0xFFffb367)),
-                                           ),
-                                           Expanded(
-                                             child: _buildSignalCard(recents7d, "Past 7d",context,color: Color(0xFFcc6601)),
-                                           ),
-                                           Expanded(
-                                             child: _buildSignalCard(underMonitoring, "Under monitoring",context,color: Color(0xFFcdcc00 )),
-                                           ),
-                                         ],
-                                       ),
-                                     );
+                                     // print("object===");
+                                     // print(trackedEntity.length);
+                                     if(state is GetTrackedSignalCompleted){
+                                       // final recents=filterByDays(trackedEntity, 14);
+                                       final recents=filterSortAndTake(trackedEntity, 14);
+                                       return recents.isNotEmpty? InfiniteScrollRow(recents,"signal"):Offstage();
+                                     }
+                                     return const SizedBox();
                                    }
-                                   return const Center(child: CircularProgressIndicator());
+                               ),
+                               SizedBox(height: 10,),
+                               BlocBuilder(
+                                   bloc: context.read<SignalBloc>(),
+                                   builder: (context,state) {
+                                     if(state is GetTrackedSignalCompleted){
+                                       final trackedEntity=context.read<SignalBloc>().trackedEntity;
 
+                                       final recents3d=filterSortAndTake(trackedEntity, 3);
+                                       final recents7d=filterSortAndTake(trackedEntity, 7);
+                                       final underMonitoring= getUnderMonitoring(trackedEntity);
+
+                                       return Column(
+                                         children: [
+                                           SizedBox(
+                                             height: 80,
+                                             child: Row(
+                                               children: [
+                                                 Expanded(
+                                                   child: _buildSignalCard(trackedEntity, "All",context,color: Color(0xFFc2c2c2)),
+                                                 ),
+                                                 Expanded(
+                                                   child: _buildSignalCard(recents3d, "Past 3d",context,color: Color(0xFFffb367)),
+                                                 ),
+                                                 Expanded(
+                                                   child: _buildSignalCard(recents7d, "Past 7d",context,color: Color(0xFFcc6601)),
+                                                 ),
+                                                 Expanded(
+                                                   child: _buildSignalCard(underMonitoring, "Under monitoring",context,color: Color(0xFFcdcc00 )),
+                                                 ),
+                                               ],
+                                             ),
+                                           ),
+
+                                           const SizedBox(height: 14),
+                                           Center(child: BlinkingText()),
+                                         ],
+                                       );
+                                     }
+                                     return const SizedBox();
+
+                                   }
+                               ),
+                               // Padding(
+                               //   padding: const EdgeInsets.only(top: 8.0,left: 8),
+                               //   child: Text(
+                               //     "Events",
+                               //     style: TextStyle(fontSize: 18,fontWeight: FontWeight.w700,color: Colors.black),
+                               //   ),
+                               // ),
+                               const SizedBox(height: 20),
+                               BlocBuilder(
+                                   bloc: context.read<SignalBloc>(),
+                                   builder: (context,state) {
+                                     if(state is GetTrackedSignalCompleted){
+                                   return SizedBox(
+                                     height: 400,
+                                     child: Builder(
+                                         builder: (context) {
+                                           final trackedEntity=context.read<SignalBloc>().trackedEntity;
+                                           // final ongoing= getOngoing(trackedEntity);
+                                           return MyMapSignalWidget(trackedEntity: trackedEntity);
+                                         }
+                                     ),
+                                   );}
+
+                                     return const SizedBox();
                                  }
-                             ),
-                             const SizedBox(height: 14),
-                             Center(child: BlinkingText()),
-                             // Padding(
-                             //   padding: const EdgeInsets.only(top: 8.0,left: 8),
-                             //   child: Text(
-                             //     "Events",
-                             //     style: TextStyle(fontSize: 18,fontWeight: FontWeight.w700,color: Colors.black),
-                             //   ),
-                             // ),
-                             const SizedBox(height: 20),
-                             BlocBuilder(
-                                 bloc: context.read<SignalBloc>(),
-                                 builder: (context,state) {
-                                   if(state is GetTrackedSignalCompleted){
-                                 return SizedBox(
-                                   height: 400,
-                                   child: Builder(
-                                       builder: (context) {
-                                         final trackedEntity=context.read<SignalBloc>().trackedEntity;
-                                         // final ongoing= getOngoing(trackedEntity);
-                                         return MyMapSignalWidget(trackedEntity: trackedEntity);
-                                       }
-                                   ),
-                                 );}
+                               ),
 
-                                   return const Center(child: CircularProgressIndicator());
-                               }
-                             ),
+                               SizedBox(height: 20,),
+                                BlocBuilder(
+                                bloc: context.read<SignalBloc>(),
+                                builder: (context,state) {
+                                if(state is GetTrackedSignalCompleted){
+                                    final trackedEntity=context.read<SignalBloc>().trackedEntity;
+                                     return RecentsCard(trackedEntity,title: "Signals",isSignal: true);}
 
-                             SizedBox(height: 20,),
-                              BlocBuilder(
-                              bloc: context.read<SignalBloc>(),
-                              builder: (context,state) {
-                              if(state is GetTrackedSignalCompleted){
-                                  final trackedEntity=context.read<SignalBloc>().trackedEntity;
-                                   return RecentsCard(trackedEntity,title: "Signals",isSignal: true);}
+                                return const Center(child: CircularProgressIndicator());
+                                 }
+                               ),
+                               ]
 
-                              return const Center(child: CircularProgressIndicator());
-                               }
-                             ),
-                             ]
-
-                       ),)))
-                    ],
+                         ),)))
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
 
           );
@@ -698,10 +710,10 @@ class _WhoAfrDashboardState extends State<WhoAfrDashboard>   with WidgetsBinding
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _statCard(context,"New", recent, [Color(0xFF4287f5),Color(0xFF4287f5)]),//nb
-                    _statCard(context,"Ongoing ", ongoing, [Color(0xFF4287f5),Color(0xFF4287f5)]),
-                    _statCard(context,"Outbreaks", data[0], [Color(0xFF4287f5),Color(0xFF4287f5)]),
-                    _statCard(context,"Humanitarian",data[1], [Color(0xFF4287f5),Color(0xFF4287f5)]),
+                    _statCard(context,"New", recent, [Color(0xFF1b6afe),Color(0xFF4287f5)]),//nb
+                    _statCard(context,"Ongoing ", ongoing, [Color(0xFF00ad75),Color(0xFF4287f5)]),
+                    _statCard(context,"Outbreaks", data[0], [Color(0xFFf11828),Color(0xFF4287f5)]),
+                    _statCard(context,"Humanitarian",data[1], [Color(0xFFf18a00),Color(0xFF4287f5)]),
                   ],
                 ),
               ),
@@ -731,19 +743,19 @@ class _WhoAfrDashboardState extends State<WhoAfrDashboard>   with WidgetsBinding
           padding: const EdgeInsets.all(5),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(5),
-            // color: Colors.white,
-            gradient: LinearGradient(
-              begin: Alignment.bottomCenter,
-                end: Alignment.topCenter,
-              colors: color,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.5),
-                blurRadius: 6,
-                offset: const Offset(0, 3),
-              ),
-            ],
+            color: color[0],
+            // gradient: LinearGradient(
+            //   begin: Alignment.bottomCenter,
+            //     end: Alignment.topCenter,
+            //   colors: color,
+            // ),
+            // boxShadow: [
+            //   BoxShadow(
+            //     color: Colors.black.withOpacity(0.5),
+            //     blurRadius: 6,
+            //     offset: const Offset(0, 3),
+            //   ),
+            // ],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -1077,4 +1089,52 @@ class _BlinkingTextState extends State<BlinkingText>
       ),
     );
   }
+}
+void showCustomBottomSheet(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true, // full screen control
+    backgroundColor: Colors.transparent, // for rounded design
+    builder: (context) {
+      return DraggableScrollableSheet(
+        initialChildSize: 0.8, // start almost full screen
+        minChildSize: 0.5,
+        maxChildSize: 1.0,
+        expand: false,
+        builder: (context, scrollController) {
+          return Container(
+            decoration: const BoxDecoration(
+              color: const Color(0xFFececec),
+              borderRadius: BorderRadius.vertical(
+                top: Radius.circular(24),
+              ),
+            ),
+            child: Column(
+              children: [
+                // 🔹 Handle
+                const SizedBox(height: 10),
+                Center(
+                  child: Container(
+                    width: 50,
+                    height: 6,
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 5),
+
+                // 🔹 Scrollable content
+                Expanded(
+                  child: LoginScreen()
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    },
+  );
 }

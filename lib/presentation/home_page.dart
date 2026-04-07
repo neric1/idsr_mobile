@@ -3,14 +3,24 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:idsr/application/entity/entity_bloc.dart';
 import 'package:idsr/application/entity/entity_event.dart';
+import 'package:idsr/application/idsr/threshold_bloc.dart';
+import 'package:idsr/application/idsr/threshold_event.dart';
 import 'package:idsr/application/signals/signal_bloc.dart';
 import 'package:idsr/application/signals/signal_event.dart';
+import 'package:idsr/application/user/user_bloc.dart';
+import 'package:idsr/application/user/user_state.dart';
 import 'package:idsr/data/entity/models/tracked_entity.dart';
+import 'package:idsr/presentation/ai_chat_bot/ai_chat_bot.dart';
+import 'package:idsr/presentation/auth/login_screen.dart';
 import 'package:idsr/presentation/messages/Messages.dart';
 import 'package:idsr/presentation/reports/reports.dart';
 import 'package:idsr/presentation/settings/settings.dart';
 import 'package:idsr/presentation/week_picker.dart';
 import 'package:idsr/presentation/who_afro_dashboard.dart';
+import 'package:idsr/presentation/widget/ai_fab.dart';
+import 'package:idsr/session_hive.dart';
+import 'package:idsr/utils/constant.dart';
+import 'package:idsr/utils/utils.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 import 'package:week_of_year/date_week_extensions.dart';
@@ -29,12 +39,27 @@ class _HomePageState extends State<HomePage> {
   DateTime current=DateTime.now();
   DateTime? endDate;
   DateTimeRange? rangeDate;
-
+  final PersistentTabController _controller = PersistentTabController(initialIndex: 0);
+  int _lastIndex = 0;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     rangeDate=DateTimeRange(start: Jiffy.parseFromDateTime(current).startOf(Unit.week).dateTime, end: Jiffy.parseFromDateTime(current).endOf(Unit.week).dateTime);
+    _controller.addListener(() async {
+
+      final newIndex = _controller.index;
+
+      if ( !Session.isLoggedIn && newIndex==1){
+        _lastIndex=newIndex;
+        showCustomBottomSheet2(context);
+        _controller.jumpToTab(0);
+        // return;
+      }else{
+        // _lastIndex=0;
+        _controller.jumpToTab(newIndex);
+      }
+    });
 
   }
 
@@ -42,7 +67,20 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
 
     return Scaffold(
-
+        floatingActionButton: Padding(
+          padding: const EdgeInsets.only(bottom: 50),
+          child: AiFab(
+            onTap: () {
+              // Open chatbot screen
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const AiChatBot(),
+                ),
+              );
+            },
+          ),
+        ),
         backgroundColor: const Color(0xFFececec),
         appBar: AppBar(
           elevation: 0,
@@ -103,55 +141,73 @@ class _HomePageState extends State<HomePage> {
             // ),
           ],
         ),
-      body: PersistentTabView(
-        tabs: [
-          PersistentTabConfig(
-            screen: WhoAfrDashboard(),
-            item: ItemConfig(
-              icon: Icon(Icons.event),
-              title: "S&E",
+      body: BlocListener(
+        bloc: context.read<UserBloc>(),
+        listener: (context, state) {
+          if (state is GetUserCompleted) {
+            _controller.jumpToTab(_lastIndex);
+            setState(() {
+              _lastIndex=0;
+            });
+          }else{
+            // _pageController.animateToPage(
+            //   0,
+            //   duration: const Duration(milliseconds: 250),
+            //   curve: Curves.easeOut,
+            // );
+          }
+        },
+        child: PersistentTabView(
+          controller: _controller,
+          tabs: [
+            PersistentTabConfig(
+              screen: WhoAfrDashboard(),
+              item: ItemConfig(
+                icon: Icon(Icons.event),
+                title: "S&E",
+              ),
             ),
-          ),
-          PersistentTabConfig(
-            screen:Idsr() ,
-            item: ItemConfig(
-              icon: Icon(Icons.medical_services),
-              title: "IDSR",
+            PersistentTabConfig(
+              screen:Idsr() ,
+              item: ItemConfig(
+                icon: Icon(Icons.medical_services),
+                title: "IDSR",
+              ),
             ),
-          ),
-          PersistentTabConfig(
-            screen:Messages() ,
-            item: ItemConfig(
-              icon: Icon(Icons.message),
-              title: "Messages",
+            PersistentTabConfig(
+              screen:Messages() ,
+              item: ItemConfig(
+                icon: Icon(Icons.message),
+                title: "Messages",
+              ),
             ),
-          ),
-          PersistentTabConfig(
-            screen: Reports(),
-            item: ItemConfig(
-              icon: Icon(Icons.stacked_bar_chart),
-              title: "Reports",
+            PersistentTabConfig(
+              screen: Reports(),
+              item: ItemConfig(
+                icon: Icon(Icons.stacked_bar_chart),
+                title: "Reports",
+              ),
             ),
-          ),
-          PersistentTabConfig(
-            screen:Settings() ,
-            item: ItemConfig(
-              icon: Icon(Icons.settings),
-              title: "Settings",
+            PersistentTabConfig(
+              screen:Settings() ,
+              item: ItemConfig(
+                icon: Icon(Icons.settings),
+                title: "Settings",
+              ),
             ),
+          ],
+          navBarBuilder: (navBarConfig) => Style7BottomNavBar(
+            // navBarDecoration: NavBarDecoration(
+            //   color: Colors.blue.withValues(alpha: 0.3),
+            //   boxShadow: [
+            //     BoxShadow(
+            //       color: Colors.black26,
+            //       blurRadius: 10,
+            //     ),
+            //   ],
+            // ),
+            navBarConfig: navBarConfig,
           ),
-        ],
-        navBarBuilder: (navBarConfig) => Style7BottomNavBar(
-          // navBarDecoration: NavBarDecoration(
-          //   color: Colors.blue.withValues(alpha: 0.3),
-          //   boxShadow: [
-          //     BoxShadow(
-          //       color: Colors.black26,
-          //       blurRadius: 10,
-          //     ),
-          //   ],
-          // ),
-          navBarConfig: navBarConfig,
         ),
       )
 
@@ -208,6 +264,11 @@ class _HomePageState extends State<HomePage> {
                           .add(GetTrackedSignalEvent(programeId: 'E12ZY36aT08&attribute=Zhmz8B6mqEx:GE:2017-01-07:LE:$dateEnd'));
                       context.read<EntityBloc>()
                           .add(GetTrackedEntityEvent(programeId: 'bG3Arfj8AtF&attribute=IXtYxqMzT6W:GE:1999-12-25:LE:$dateEnd'));
+
+                      final w="${current.year}W$isoweek";
+                      context.read<ThresholdBloc>()
+                          .add(LoadThreshold(getOrganizationUnit(), "${getPreviousWeek(w)};$w"));
+
                     },
                   ),
                 );
@@ -215,16 +276,16 @@ class _HomePageState extends State<HomePage> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: Color(0xFF4287f5),
+                  color: Color(0xFF2196f3),
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child:  Text(
                   "Epi Week $isoweek, ${rangeDate!.end.year}",
-                  style: TextStyle(color: Colors.white,fontSize: 15),
+                  style: TextStyle(color: Colors.white,fontSize: 13),
                 ),
               ),
             ),
-            rangeDate!=null?Text(getWeekRangeText(rangeDate!.start,rangeDate!.end),style: TextStyle(fontSize: 12, color: Colors.black,fontWeight: FontWeight.w400),):Offstage()
+            rangeDate!=null?Text(getWeekRangeText(rangeDate!.start,rangeDate!.end),style: TextStyle(fontSize: 11, color: Colors.black,fontWeight: FontWeight.w400),):Offstage()
           ],
         ),
       ],
@@ -439,4 +500,53 @@ class EventGridBox extends StatelessWidget {
       ),
     );
   }
+}
+
+void showCustomBottomSheet2(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true, // full screen control
+    backgroundColor: Colors.transparent, // for rounded design
+    builder: (context) {
+      return DraggableScrollableSheet(
+        initialChildSize: 0.7, // start almost full screen
+        minChildSize: 0.5,
+        maxChildSize: 1.0,
+        expand: false,
+        builder: (context, scrollController) {
+          return Container(
+            decoration: const BoxDecoration(
+              color: const Color(0xFFececec),
+              borderRadius: BorderRadius.vertical(
+                top: Radius.circular(24),
+              ),
+            ),
+            child: Column(
+              children: [
+                // 🔹 Handle
+                const SizedBox(height: 10),
+                Center(
+                  child: Container(
+                    width: 50,
+                    height: 6,
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 5),
+
+                // 🔹 Scrollable content
+                Expanded(
+                    child: LoginScreen()
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    },
+  );
 }

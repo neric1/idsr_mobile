@@ -3,14 +3,15 @@ import 'dart:convert';
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:idsr/api/api.dart';
-import 'package:idsr/data/entity/models/tracked_entity.dart';
+import 'package:idsr/api/apiv2.dart';
 import 'package:idsr/data/entity/repository/entity_repository.dart';
 import 'package:idsr/data/models/error_response.dart';
 import 'package:idsr/data/models/success_response.dart';
+import 'package:idsr/data/signals/repository/signals_repository.dart';
 
-class EntityRepositoryImpl extends EntityRepository {
-  final Api api;
-  EntityRepositoryImpl(this.api);
+class SignalsRepositoryImpl extends SignalsRepository {
+  final ApiV2 api;
+  SignalsRepositoryImpl(this.api);
 
 
   @override
@@ -29,21 +30,21 @@ class EntityRepositoryImpl extends EntityRepository {
     }
   }
   @override
-  Future<Either<ErrorResponse, SuccessResponse<List<HumanitarianReport>>>> fetchComments() async {
+  Future<Either<ErrorResponse, SuccessResponse<Map<String,dynamic>>>> getUser({required String username,required String password}) async {
     try {
-      final response = await api.dio.get("dataStore/notes_app/all_notes");
+      String path="me";
 
-
-      if (response.statusCode == 200) {
-
-        final comments = HumanitarianReport.listFromJson(response.data);
-
-        return Right(SuccessResponse<List<HumanitarianReport>>(response.statusCode,comments));
-            } else {
-        return Left(ErrorResponse(0,'Server error: ${response.statusCode}'));
-      }
+      final basicAuth = 'Basic ${base64Encode(utf8.encode('$username:$password'))}';
+      final response = await api.dio.get(path,options: Options(headers: {
+        "Authorization": basicAuth,
+      }));
+      return Right(SuccessResponse<Map<String,dynamic>>(response.statusCode,response.data));
     } catch (e) {
-      return Left(ErrorResponse(0,e.toString()));
+      if (e is DioException) {
+        return Left(ErrorResponse(e.response?.statusCode??0,"Unauthorized"));
+      }
+      // debugPrint(e.toString());
+      return Left(ErrorResponse(0,'Unknown error occurred'));
     }
   }
 }

@@ -1,5 +1,10 @@
+import 'dart:convert';
+
 import 'package:collection/collection.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:idsr/application/entity/events/comments_bloc.dart';
 import 'package:idsr/data/entity/models/tracked_entity.dart';
 import 'package:idsr/presentation/widget/timeline.dart';
 
@@ -22,6 +27,7 @@ class _SignalsDetailsState extends State<SignalsDetails> {
    TeiAttribute? afro;
    TeiAttribute? start;
    TeiAttribute? end;
+   TeiAttribute? fullNotesNameAttribute;
   @override
   void initState() {
     // TODO: implement initState
@@ -41,6 +47,11 @@ class _SignalsDetailsState extends State<SignalsDetails> {
           (attr) =>  attr.attribute=="Zhmz8B6mqEx",
       // orElse: () => null,
     );
+       fullNotesNameAttribute = entity.attributes.firstWhereOrNull(
+            (attr) {
+          return attr.displayName == "Comments";
+        },);
+        //
       afro =entity.attributes.firstWhereOrNull(
           (attr) => attr.attribute == "IXtYxqMzT6W" || attr.attribute=="Zhmz8B6mqEx",
       // orElse: () => null,
@@ -158,11 +169,88 @@ class _SignalsDetailsState extends State<SignalsDetails> {
                padding: const EdgeInsets.all(8.0),
                child: Text("No Description",style: TextStyle(color: Colors.grey),),
                ),
+              SizedBox(height: 10,),
+              widget.type=="signal"?Offstage(): Text(
+                "Comments:",
+                style: TextStyle(fontSize:16,fontWeight: FontWeight.w600),
+              ),
+              // Text(
+              //   notesFull??"--",
+              //   textAlign: TextAlign.justify,
+              //   style: TextStyle(color: Colors.black,),
+              // ),
+              widget.type=="signal"?Offstage(): Builder(
+                  builder: (context) {
 
+                    final notesFull=fullNotesNameAttribute?.value;
+
+                    final tei=widget.trackedEntity.trackedEntityInstance;
+                    final comments=context.watch<CommentBloc>().comments;
+                    final teiComment=comments.where((comment) => comment.teiId==tei).toList();
+
+                    List<HumanitarianReport> reports =teiComment;
+                    try{
+                      if(notesFull!=null && notesFull.isNotEmpty)reports.addAll(HumanitarianReport.listFromJson(jsonDecode(notesFull??"")));
+                    }catch(e){
+                      if (kDebugMode) {
+                        print(e.toString());
+                      }
+                    }
+                    return reports.isNotEmpty? Column(
+                      children: reports.map((report) {
+                        return _buildReportCard(report);
+                      }).toList(),
+                    ):Offstage();
+                  }
+              ),
+              SizedBox(height: 50,),
             ]),
         ))
       );
   }
+   Widget _buildReportCard(HumanitarianReport report) {
+     return Container(
+       margin: const EdgeInsets.symmetric(vertical: 8),
+       padding: const EdgeInsets.all(16),
+       decoration: BoxDecoration(
+         color: const Color(0xFFD9CF8B), // light yellow
+         borderRadius: BorderRadius.circular(12),
+         border: Border.all(color: Colors.grey.shade400),
+       ),
+       child: Column(
+         crossAxisAlignment: CrossAxisAlignment.start,
+         children: [
+           // Header (name + date)
+           Container(
+             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+             decoration: BoxDecoration(
+               color: const Color(0xFFE6D88F),
+               borderRadius: BorderRadius.circular(6),
+             ),
+             child: Text(
+               "${report.storedBy} (${_formatDate(report.storedAt)})",
+               style: const TextStyle(
+                 fontWeight: FontWeight.bold,
+               ),
+             ),
+           ),
+
+           const SizedBox(height: 12),
+
+           // Content
+           Text(
+             report.value,
+             style: const TextStyle(fontSize: 14),
+           ),
+         ],
+       ),
+     );
+   }
+   String _formatDate(DateTime date) {
+     return "${date.year}-${_two(date.month)}-${_two(date.day)}";
+   }
+
+   String _two(int n) => n.toString().padLeft(2, '0');
 }
 class InfoRow extends StatelessWidget {
   final String label;

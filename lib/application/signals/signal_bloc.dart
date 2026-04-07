@@ -1,20 +1,32 @@
 
+import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:idsr/application/signals/signal_event.dart';
 import 'package:idsr/application/signals/signal_state.dart';
+import 'package:idsr/application/user/user_bloc.dart';
+import 'package:idsr/application/user/user_state.dart';
 import 'package:idsr/data/entity/models/tracked_entity.dart';
 import 'package:idsr/data/entity/repository/entity_repository.dart';
+import 'package:idsr/data/signals/repository/signals_repository.dart';
 
 
 class SignalBloc extends Bloc<SignalEvent, SignalState> {
-  final EntityRepository entityRepository;
+  final SignalsRepository signalsRepository;
 
+  final UserBloc userBloc;
   List<TrackedEntity> _trackedEntity=[];
   List<TrackedEntity> get trackedEntity => _trackedEntity;
   List<TrackedEntity> _trackedEntityAll=[];
-  SignalBloc({required this.entityRepository})
-      : super(SignalInitial()) {
 
+  late StreamSubscription userSubscription;
+  SignalBloc({required this.signalsRepository,required this.userBloc})
+      : super(SignalInitial()) {
+    userSubscription = userBloc.stream.listen((authState) {
+      if (authState is GetUserCompleted) {
+        add(GetTrackedSignalEvent(programeId: 'E12ZY36aT08&attribute=Zhmz8B6mqEx:GE:2017-01-07:LE:null'));
+      }
+    });
     on<GetTrackedSignalEvent>((event, emit) async {
       emit(GetTrackedSignalLoading());
 
@@ -41,7 +53,7 @@ class SignalBloc extends Bloc<SignalEvent, SignalState> {
 
       }else{
 
-        final response = await entityRepository.getTrackedEntity(programeId:event.programeId);
+        final response = await signalsRepository.getTrackedEntity(programeId:event.programeId);
       emit(response.fold(
               (error) {
             return GetTrackedSignalError(

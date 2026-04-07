@@ -2,12 +2,13 @@ import 'dart:convert';
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:idsr/api/api.dart';
+import 'package:idsr/api/apiv2.dart';
 import 'package:idsr/data/idsr/repository/threshold_repository.dart';
 import 'package:idsr/data/models/error_response.dart';
 import 'package:idsr/data/models/success_response.dart';
 class ThresholdRepositoryImpl extends ThresholdRepository {
 
-  final Api api;
+  final ApiV2 api;
   ThresholdRepositoryImpl(this.api);
 
 

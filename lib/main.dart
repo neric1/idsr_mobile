@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:idsr/api/apiv2.dart';
 import 'package:idsr/application/entity/entity_bloc.dart';
+import 'package:idsr/application/entity/events/comments_bloc.dart';
+import 'package:idsr/application/user/user_bloc.dart';
+import 'package:idsr/data/signals/repository/signals_repository.dart';
 import 'package:idsr/dependency_injector.dart';
 import 'package:idsr/presentation/home_page.dart';
 import 'package:idsr/routes/routes.dart';
@@ -15,6 +21,11 @@ Future<void> main() async {
 
   await dotenv.load(fileName: ".env");
   await Jiffy.setLocale('en_GB');
+  try {
+    // final dir = await getApplicationDocumentsDirectory();
+    await Hive.initFlutter();
+    await Hive.openBox('semsBox');
+  } catch (e) {}
   init();
   await injector.allReady();
   runApp(const MyApp());
@@ -30,11 +41,20 @@ class MyApp extends StatelessWidget {
 
     return  MultiBlocProvider(
         providers: [
-        BlocProvider(create: (context) => SignalBloc(entityRepository: injector())),
+          BlocProvider(create: (context) => UserBloc(signalsRepository: injector<SignalsRepository>(),
+            appHttpClient: injector(),)),
+        BlocProvider(create: (context) => SignalBloc(
+            signalsRepository: injector<SignalsRepository>(), userBloc: context.read<UserBloc>()),
+
+        ),
     BlocProvider(create: (context) => EntityBloc(
     entityRepository: injector(),
-    )),BlocProvider(
-    create: (context) => ThresholdBloc(repository:injector()))
+    )),
+          BlocProvider(create: (context) => CommentBloc(
+             injector(),
+          )),
+          BlocProvider(
+    create: (context) => ThresholdBloc(repository:injector(),userBloc: context.read<UserBloc>()))
 
           ,],
       child: MaterialApp.router(

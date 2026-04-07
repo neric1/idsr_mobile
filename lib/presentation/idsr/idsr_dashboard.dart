@@ -7,6 +7,7 @@ import 'package:idsr/presentation/idsr/threshold_disease_country.dart';
 import 'package:idsr/presentation/idsr/threshold_disease_country_details_table.dart';
 import 'package:idsr/presentation/who_afro_dashboard.dart';
 import 'package:idsr/presentation/widget/disease_threshold_result.dart';
+import 'package:idsr/utils/constant.dart';
 
 class IdsrDashboard extends StatelessWidget {
   final String orgunit;
@@ -76,7 +77,9 @@ class IdsrDashboard extends StatelessWidget {
           final items = state.data.metaData['items'];
           final dx = state.data.metaData['dimensions']['dx'];
           List<Widget> diseaseButtons=[];
+          List<Widget> diseaseButtonsAll=[];
           for (var id in dx) {
+            final isD=defaultDeases().split(";").contains(id);
           final result = getDiseaseThreshold(
             context: context,
             onButtonClick: (v) {
@@ -92,8 +95,10 @@ class IdsrDashboard extends StatelessWidget {
             data: state.data,
             id: id,
           );
-
-          if (result.isOver) {
+            if (result.isOver) {
+              diseaseButtonsAll.add(result.button);
+            }
+          if (result.isOver && isD) {
             diseaseButtons.add(result.button);
           }}
 
@@ -136,7 +141,7 @@ class IdsrDashboard extends StatelessWidget {
 
 
                     children:[...diseaseButtons.take(9),
-                    buildViewMore(diseaseButtons.length - 5,context,diseaseButtons),
+                    buildViewMore(diseaseButtonsAll.length -9,context,diseaseButtons),
                   ]
                   // dx.map<Widget>((id) {
                   //

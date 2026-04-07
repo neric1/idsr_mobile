@@ -61,11 +61,11 @@ DiseaseThresholdResult getDiseaseThreshold({
           width: 1,
         ),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(7),
         ),
       ),
       child: Row(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
 
@@ -79,13 +79,16 @@ DiseaseThresholdResult getDiseaseThreshold({
                   color: selected==id? Colors.white:Colors.black,),
             ),
           ),
-          const SizedBox(width: 4),
-          Text(
-            "$total",
-            style:  TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color:selected==id? Colors.white:Colors.red,
+          // const SizedBox(width: 4),
+          Padding(
+            padding: const EdgeInsets.only(left: 4.0),
+            child: Text(
+              "$total",
+              style:  TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color:selected==id? Colors.white:Colors.red,
+              ),
             ),
           ),
         ],

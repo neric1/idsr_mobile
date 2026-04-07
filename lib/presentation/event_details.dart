@@ -1,5 +1,10 @@
+import 'dart:convert';
+
 import 'package:collection/collection.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:idsr/application/entity/events/comments_bloc.dart';
 import 'package:idsr/data/entity/models/tracked_entity.dart';
 import 'package:idsr/presentation/widget/timeline.dart';
 
@@ -32,10 +37,17 @@ class EventDetails extends StatelessWidget {
               itemCount: trackedEntities.length,
               itemBuilder: (context, index) {
                 final entity=trackedEntities[index];
+                final tei=entity.trackedEntityInstance;
                 TeiAttribute?   eventNameAttribute = entity.attributes.firstWhereOrNull(
                       (attr) {
                         return attr.displayName == "Event name" || attr.attribute == "LEAwqoW5Rtc";
                       },
+                  // orElse: () => null,
+                );
+                TeiAttribute?   fullNotesNameAttribute = entity.attributes.firstWhereOrNull(
+                      (attr) {
+                    return attr.displayName == "Comments";
+                  },
                   // orElse: () => null,
                 );
                 TeiAttribute?   eventNoteAttribute = entity.attributes.firstWhereOrNull(
@@ -69,6 +81,7 @@ class EventDetails extends StatelessWidget {
                 );
                 final eventname=eventNameAttribute?.value;
                 final notes=eventNoteAttribute?.value;
+                final notesFull=fullNotesNameAttribute?.value;
                 return Container(
                   margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
                   decoration: BoxDecoration(
@@ -133,20 +146,7 @@ class EventDetails extends StatelessWidget {
                                 ],
                               ):TimelineCard(valuemoh: moh?.value,valuewco: wco?.value,valuemafro: afro?.value,valuestart: start?.value,valueend: end?.value,),
 
-                              // Column(
-                              //   children: [
-                              //     InfoRow(label:"Date detected by MoH:" ,value: moh?.value,),
-                              //     SizedBox(height: 3),
-                              //     InfoRow(label:"Date notified to WCO:" ,value: wco?.value,),
-                              //     SizedBox(height: 3),
-                              //     InfoRow(label:"Date notified to AFRO:" ,value: afro?.value,),
-                              //     SizedBox(height: 3),
-                              //     InfoRow(label:"Start  of reporting period:" ,value: start?.value,),
-                              //     SizedBox(height: 3),
-                              //     InfoRow(label:"End of reporting period:" ,value: end?.value,),
-                              //     SizedBox(height: 6),
-                              //   ],
-                              // ),
+
 
 
                               Text(
@@ -158,6 +158,36 @@ class EventDetails extends StatelessWidget {
                                 textAlign: TextAlign.justify,
                                 style: TextStyle(color: Colors.black,),
                               ),
+                              SizedBox(height: 10,),
+                              Text(
+                                "Comments:",
+                                style: TextStyle(fontSize:16,fontWeight: FontWeight.w600),
+                              ),
+                              // Text(
+                              //   notesFull??"--",
+                              //   textAlign: TextAlign.justify,
+                              //   style: TextStyle(color: Colors.black,),
+                              // ),
+                              Builder(
+                                builder: (context) {
+                                  final comments=context.watch<CommentBloc>().comments;
+                                  final teiComment=comments.where((comment) => comment.teiId==tei).toList();
+
+                                  List<HumanitarianReport> reports =teiComment;
+                                  try{
+                                    if(notesFull!=null && notesFull.isNotEmpty)reports.addAll(HumanitarianReport.listFromJson(jsonDecode(notesFull??"")));
+                                  }catch(e){
+                                    if (kDebugMode) {
+                                      print(e.toString());
+                                    }
+                                  }
+                                  return reports.isNotEmpty? Column(
+                                    children: reports.map((report) {
+                                      return _buildReportCard(report);
+                                    }).toList(),
+                                  ):Offstage();
+                                }
+                              )
                             ],
                           ),
                         ),
@@ -177,6 +207,49 @@ class EventDetails extends StatelessWidget {
       ),
     );
   }
+  Widget _buildReportCard(HumanitarianReport report) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFD9CF8B), // light yellow
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade400),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header (name + date)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(
+              color: const Color(0xFFE6D88F),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Text(
+              "${report.storedBy} (${_formatDate(report.storedAt)})",
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          // Content
+          Text(
+            report.value,
+            style: const TextStyle(fontSize: 14),
+          ),
+        ],
+      ),
+    );
+  }
+  String _formatDate(DateTime date) {
+    return "${date.year}-${_two(date.month)}-${_two(date.day)}";
+  }
+
+  String _two(int n) => n.toString().padLeft(2, '0');
 }
 class InfoRow extends StatelessWidget {
   final String label;

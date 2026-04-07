@@ -308,3 +308,43 @@ class EventItem {
     );
   }
 }
+class HumanitarianReport {
+  final String storedBy;
+  final DateTime storedAt;
+  final String value;
+  final String teiId;
+
+
+  HumanitarianReport({
+    this.storedBy = '',
+    DateTime? storedAt,
+    this.value = '',
+    this.teiId='',
+  }) : storedAt = storedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+
+  factory HumanitarianReport.fromJson(Map<String, dynamic> json) {
+    return HumanitarianReport(
+      storedBy: json['storedBy'] ?? '',
+      storedAt: json['storedAt'] != null
+          ? DateTime.tryParse(json['storedAt']) ?? DateTime.fromMillisecondsSinceEpoch(0)
+          : DateTime.fromMillisecondsSinceEpoch(0),
+      value: json['value'] ?? '',
+      teiId: json['teiId'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'storedBy': storedBy,
+      'storedAt': storedAt.toIso8601String(),
+      'value': value,
+      'teiId': teiId,
+    };
+  }
+
+  static List<HumanitarianReport> listFromJson(List<dynamic> jsonList) {
+    return jsonList
+        .map((e) => HumanitarianReport.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+}

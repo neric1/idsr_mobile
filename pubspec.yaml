@@ -55,6 +55,8 @@ dependencies:
   week_of_year: ^2.2.0
   google_fonts: ^6.3.2
   persistent_bottom_nav_bar_v2: ^6.3.1
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
 
 
 dev_dependencies:
