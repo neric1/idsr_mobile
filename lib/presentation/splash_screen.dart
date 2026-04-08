@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:idsr/application/entity/entity_bloc.dart';
@@ -55,55 +56,72 @@ class _SplashScreenState extends State<SplashScreen> {
               }
             }
           },
-          child: Center(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    textAlign: TextAlign.center,
-                    "Signals and Events Monitoring",
-                    style:GoogleFonts.raleway(
-                      fontSize: 48,
-                      fontWeight: FontWeight.w200,
-                      color: Colors.white,
-                    ),
-                  ),
-                  Stack(
-                    children: [
-                      Image.asset('assets/logo2.png',height: 200,width: 200,fit: BoxFit.contain,),
-                      Positioned(
-                        bottom: 0, // distance from bottom
-                        left: 0,
-                        right: 0,
-                        child: Center(
-                          child: Text(
-                            "SEMS",
-                            style: TextStyle(
-                              fontSize: 40,
-                              fontWeight: FontWeight.w700,
-                              color: Color(0xFF2c6693),
-                              letterSpacing: 1.2,
-                            ),
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 18.0),
+                child: SvgPicture.asset(
+                  'assets/logo.svg',
+
+                  height: 100,
+                  fit: BoxFit.contain,
+                  colorFilter: const ColorFilter.mode(Colors.blue, BlendMode.srcIn),
+                ),
+              ),
+              Expanded(
+                child: Center(
+
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          textAlign: TextAlign.center,
+                          "Signals and Events Monitoring",
+                          style:GoogleFonts.raleway(
+                            fontSize: 48,
+                            fontWeight: FontWeight.w200,
+                            color: Colors.white,
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 20,),
-                  Text(
-                    textAlign: TextAlign.center,
-                    "Mobile app",
-                    style:GoogleFonts.raleway(
-                      fontSize: 48,
-                      fontWeight: FontWeight.w200,
-                      color: Colors.white,
+                        Stack(
+                          children: [
+                            Image.asset('assets/logo2.png',height: 200,width: 200,fit: BoxFit.contain,),
+                            Positioned(
+                              bottom: 0, // distance from bottom
+                              left: 0,
+                              right: 0,
+                              child: Center(
+                                child: Text(
+                                  "SEMS",
+                                  style: TextStyle(
+                                    fontSize: 40,
+                                    fontWeight: FontWeight.w700,
+                                    color: Color(0xFF2c6693),
+                                    letterSpacing: 1.2,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 20,),
+                        Text(
+                          textAlign: TextAlign.center,
+                          "Mobile app",
+                          style:GoogleFonts.raleway(
+                            fontSize: 48,
+                            fontWeight: FontWeight.w200,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
+                ),
               ),
-            ),
+            ],
           ),
         ),
       ),

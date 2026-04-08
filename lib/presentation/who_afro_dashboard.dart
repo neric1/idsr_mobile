@@ -743,7 +743,7 @@ class _WhoAfrDashboardState extends State<WhoAfrDashboard>   with WidgetsBinding
           padding: const EdgeInsets.all(5),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(5),
-            color: color[0],
+            color: color[0].withValues(alpha: 0.8),
             // gradient: LinearGradient(
             //   begin: Alignment.bottomCenter,
             //     end: Alignment.topCenter,
