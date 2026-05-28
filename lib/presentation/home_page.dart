@@ -12,8 +12,10 @@ import 'package:idsr/application/user/user_state.dart';
 import 'package:idsr/data/entity/models/tracked_entity.dart';
 import 'package:idsr/presentation/ai_chat_bot/ai_chat_bot.dart';
 import 'package:idsr/presentation/auth/login_screen.dart';
+import 'package:idsr/presentation/ebola/ebola_dashboard_page.dart';
 import 'package:idsr/presentation/messages/Messages.dart';
 import 'package:idsr/presentation/reports/reports.dart';
+import 'package:idsr/presentation/settings/about.dart';
 import 'package:idsr/presentation/settings/settings.dart';
 import 'package:idsr/presentation/week_picker.dart';
 import 'package:idsr/presentation/who_afro_dashboard.dart';
@@ -34,33 +36,91 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
+// class _HomePageState extends State<HomePage> {
+//   int isoweek=DateTime.now().weekOfYear;
+//   DateTime current=DateTime.now();
+//   DateTime? endDate;
+//   DateTimeRange? rangeDate;
+//   // final PersistentTabController _controller = PersistentTabController(initialIndex: 0);
+//   late PersistentTabController _controller;
+//   int _lastIndex = 0;
+//   @override
+//   void initState() {
+//     // TODO: implement initState
+//     super.initState();
+//     rangeDate=DateTimeRange(start: Jiffy.parseFromDateTime(current).startOf(Unit.week).dateTime, end: Jiffy.parseFromDateTime(current).endOf(Unit.week).dateTime);
+//     if(!Session.isLoggedIn){
+//       _controller=PersistentTabController(initialIndex: 1);
+//       showCustomBottomSheet2(context);
+//     }else{
+//       _controller = PersistentTabController(initialIndex: 0);
+//     }
+//     _controller.addListener(() async {
+//
+//       final newIndex = _controller.index;
+//
+//       if ( !Session.isLoggedIn && (newIndex==2 || newIndex==0)){
+//         _lastIndex=newIndex;
+//         showCustomBottomSheet2(context);
+//         _controller.jumpToTab(1);
+//         // return;
+//       }else{
+//         // _lastIndex=0;
+//         _controller.jumpToTab(newIndex);
+//       }
+//       setState(() {});
+//     });
+//
+//   }
 class _HomePageState extends State<HomePage> {
   int isoweek=DateTime.now().weekOfYear;
-  DateTime current=DateTime.now();
-  DateTime? endDate;
+  late PersistentTabController _controller;
   DateTimeRange? rangeDate;
-  final PersistentTabController _controller = PersistentTabController(initialIndex: 0);
+   DateTime current = DateTime.now();
+  DateTime? endDate;
   int _lastIndex = 0;
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    rangeDate=DateTimeRange(start: Jiffy.parseFromDateTime(current).startOf(Unit.week).dateTime, end: Jiffy.parseFromDateTime(current).endOf(Unit.week).dateTime);
-    _controller.addListener(() async {
 
-      final newIndex = _controller.index;
+    rangeDate = DateTimeRange(
+      start: Jiffy.parseFromDateTime(current).startOf(Unit.week).dateTime,
+      end: Jiffy.parseFromDateTime(current).endOf(Unit.week).dateTime,
+    );
 
-      if ( !Session.isLoggedIn && newIndex==1){
-        _lastIndex=newIndex;
-        showCustomBottomSheet2(context);
-        _controller.jumpToTab(0);
-        // return;
-      }else{
-        // _lastIndex=0;
-        _controller.jumpToTab(newIndex);
-      }
-    });
+    _controller = PersistentTabController(
+      initialIndex: Session.isLoggedIn ? 0 : 1,
+    );
 
+    if (!Session.isLoggedIn) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) showCustomBottomSheet2(context);
+      });
+    }
+
+    _controller.addListener(_handleTabChange);
+  }
+
+  void _handleTabChange() {
+    final newIndex = _controller.index;
+
+    if (!Session.isLoggedIn && (newIndex == 0 || newIndex == 2)) {
+      _controller.jumpToTab(1);
+      _lastIndex=newIndex;
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) showCustomBottomSheet2(context);
+      });
+    }
+
+    if (mounted) setState(() {});
+  }
+
+  @override
+  void dispose() {
+    _controller.removeListener(_handleTabChange);
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -68,7 +128,8 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
         floatingActionButton: Padding(
-          padding: const EdgeInsets.only(bottom: 50),
+          padding: const EdgeInsets.only(bottom: 45//60
+          ),
           child: AiFab(
             onTap: () {
               // Open chatbot screen
@@ -88,7 +149,7 @@ class _HomePageState extends State<HomePage> {
           _buildHeader(context) ,
           actions: [
 
-            GestureDetector(
+         _controller.index==1?   GestureDetector(
                 onTap: (){
                   final dateEnd=endDate!=null?Jiffy.parseFromDateTime(endDate!)
                       .format(pattern: 'yyyy-MM-dd'):Jiffy.parseFromDateTime(current)
@@ -100,11 +161,19 @@ class _HomePageState extends State<HomePage> {
 
                 },
                 child: Padding(
-                  padding: const EdgeInsets.only(right: 18.0),
+                  padding: const EdgeInsets.only(right: 5.0),
                   child: Icon(Icons.sync,color: Colors.red,),
-                )),
+                )):Offstage(),
 
-
+            // IconButton(
+            //   icon: const Icon(Icons.info_outline),
+            //   onPressed: () {
+            //     Navigator.push(
+            //       context,
+            //       MaterialPageRoute(builder: (_) => const AboutPage()),
+            //     );
+            //   },
+            // ),
             //   IconButton(
             //   icon: const Icon(Icons.filter_list),
             //   onPressed: () {
@@ -161,6 +230,13 @@ class _HomePageState extends State<HomePage> {
           controller: _controller,
           tabs: [
             PersistentTabConfig(
+            screen:EbolaDashboardPage() ,
+            item: ItemConfig(
+              icon: Icon(Icons.coronavirus),
+              title: "EVD",
+            ),
+          ),
+            PersistentTabConfig(
               screen: WhoAfrDashboard(),
               item: ItemConfig(
                 icon: Icon(Icons.event),
@@ -172,13 +248,6 @@ class _HomePageState extends State<HomePage> {
               item: ItemConfig(
                 icon: Icon(Icons.medical_services),
                 title: "IDSR",
-              ),
-            ),
-            PersistentTabConfig(
-              screen:Messages() ,
-              item: ItemConfig(
-                icon: Icon(Icons.message),
-                title: "Messages",
               ),
             ),
             PersistentTabConfig(
@@ -241,7 +310,7 @@ class _HomePageState extends State<HomePage> {
           colorFilter: const ColorFilter.mode(Colors.blue, BlendMode.srcIn),
         ),
 
-        Column(
+        _controller.index==1?   Column(
           children: [
             GestureDetector(
               onTap: (){
@@ -287,7 +356,7 @@ class _HomePageState extends State<HomePage> {
             ),
             rangeDate!=null?Text(getWeekRangeText(rangeDate!.start,rangeDate!.end),style: TextStyle(fontSize: 11, color: Colors.black,fontWeight: FontWeight.w400),):Offstage()
           ],
-        ),
+        ):Offstage(),
       ],
     );
   }

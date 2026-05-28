@@ -22,6 +22,7 @@ import 'package:idsr/presentation/map_signal.dart';
 import 'package:idsr/presentation/marquee.dart';
 import 'package:idsr/presentation/week_picker.dart';
 import 'package:idsr/presentation/widget/recents_widget.dart';
+import 'package:idsr/presentation/widget/utils_widget.dart';
 import 'package:idsr/routes/routes_name.dart';
 import 'package:idsr/session_hive.dart';
 import 'package:idsr/utils/utils.dart';
@@ -269,8 +270,8 @@ class _WhoAfrDashboardState extends State<WhoAfrDashboard>   with WidgetsBinding
                 }
               },
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // SizedBox(height: 5,),
                   SizedBox(height: 5,),
                   Container(
                     padding: EdgeInsets.symmetric(vertical: 15,horizontal: 16),
@@ -595,6 +596,8 @@ class _WhoAfrDashboardState extends State<WhoAfrDashboard>   with WidgetsBinding
                       ],
                     ),
                   ),
+// SizedBox(height: 10,),
+//                   sourceLink(),
                 ],
               ),
             ),
@@ -700,7 +703,7 @@ class _WhoAfrDashboardState extends State<WhoAfrDashboard>   with WidgetsBinding
           final ongoing= getOngoing(trackedEntity);
           final data=getHumanitarianOrOutBreak(ongoing);
 
-          final recent = filterByRecentEvent(ongoing, 14);
+          final recent = filterByRecentEvent(ongoing, 7);
           return Column(
             children: [
             recent.isNotEmpty?  InfiniteScrollRow(recent,"event"):Offstage(),

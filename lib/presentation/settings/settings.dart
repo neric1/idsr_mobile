@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:idsr/application/user/user_bloc.dart';
 import 'package:idsr/application/user/user_event.dart';
 import 'package:idsr/application/user/user_state.dart';
+import 'package:idsr/presentation/settings/about.dart';
 import 'package:idsr/session_hive.dart';
 
 class Settings extends StatefulWidget {
@@ -21,6 +22,10 @@ class _SettingsState extends State<Settings> {
         builder: (context,state) {
           return Column(
             children: [
+              // Padding(
+              //   padding: const EdgeInsets.all(8.0),
+              //   child: aboutButton(context),
+              // ),
             Session.isLoggedIn || state is! Loggedout?  Padding(
                 padding: const EdgeInsets.all(18.0),
                 child: SizedBox(
@@ -58,4 +63,77 @@ class _SettingsState extends State<Settings> {
       )
     );
   }
+}
+Widget aboutButton(BuildContext context) {
+  return InkWell(
+    onTap: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const AboutPage(),
+        ),
+      );
+    },
+    borderRadius: BorderRadius.circular(14),
+    child: Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 16,
+        vertical: 14,
+      ),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(5),
+        border: Border.all(
+          color: Colors.grey.shade300,
+        ),
+        boxShadow: [
+          BoxShadow(
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+            color: Colors.black.withOpacity(0.05),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            Icons.info_outline,
+            size: 24,
+            color: Colors.blue,
+          ),
+
+          const SizedBox(width: 12),
+
+          const Expanded(
+            child: Column(
+              crossAxisAlignment:
+              CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "About",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                SizedBox(height: 2),
+                Text(
+                  "WHO AFRO collaboration",
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const Icon(
+            Icons.chevron_right,
+            color: Colors.grey,
+          ),
+        ],
+      ),
+    ),
+  );
 }

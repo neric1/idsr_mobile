@@ -4,8 +4,10 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:idsr/api/apiv2.dart';
+import 'package:idsr/application/ebola/ebola_bloc.dart';
 import 'package:idsr/application/entity/entity_bloc.dart';
 import 'package:idsr/application/entity/events/comments_bloc.dart';
+import 'package:idsr/application/idsr/desease_comparison/disease_bloc.dart';
 import 'package:idsr/application/user/user_bloc.dart';
 import 'package:idsr/data/signals/repository/signals_repository.dart';
 import 'package:idsr/dependency_injector.dart';
@@ -54,7 +56,11 @@ class MyApp extends StatelessWidget {
              injector(),
           )),
           BlocProvider(
-    create: (context) => ThresholdBloc(repository:injector(),userBloc: context.read<UserBloc>()))
+    create: (context) => ThresholdBloc(repository:injector(),userBloc: context.read<UserBloc>())),
+          BlocProvider(
+              create: (context) => DiseaseBloc(repository:injector(),userBloc: context.read<UserBloc>())),
+    BlocProvider(
+    create: (context) => EbolaBloc(repository:injector(),userBloc: context.read<UserBloc>()))
 
           ,],
       child: MaterialApp.router(

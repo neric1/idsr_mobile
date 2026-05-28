@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:idsr/application/idsr/desease_comparison/disease_bloc.dart';
+import 'package:idsr/application/idsr/desease_comparison/disease_event.dart';
 import 'package:idsr/application/idsr/threshold_bloc.dart';
 import 'package:idsr/application/idsr/threshold_event.dart';
 import 'package:idsr/presentation/idsr/idsr_dashboard.dart';
@@ -26,6 +28,9 @@ class _IdsrState extends State<Idsr> {
     final w=getPreviousWeek(getPreviousWeek("${current.year}W$isoweek"));
     context.read<ThresholdBloc>()
           .add(LoadThreshold(getOrganizationUnit(), "${getPreviousWeek(w)};$w"));
+
+    context.read<DiseaseBloc>()
+        .add(FetchDiseaseTrend(country: getOrganizationUnit(),period:  "${getPreviousWeek(w)};$w",disease: allDeseaseCompare()));
   }
   @override
   Widget build(BuildContext context) {

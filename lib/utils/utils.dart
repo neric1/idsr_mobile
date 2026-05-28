@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:collection/collection.dart';
 import 'package:idsr/data/entity/models/tracked_entity.dart';
 import 'package:week_of_year/date_week_extensions.dart';
@@ -222,4 +224,48 @@ String getPreviousWeek(String weekStr) {
   DateTime prev = date.subtract(const Duration(days: 7));
 
   return '${prev.year}W${prev.weekOfYear.toString().padLeft(2, '0')}';
+}
+Color getColor(double percentage) {
+
+  Color color;
+
+  if (percentage == 0) {
+    color = const Color(0xFF6e1a17);
+  } else if (percentage > 0) {
+    color = const Color(0xFFf2120a);
+  } else {
+    color = const Color(0xFF08c945);
+  }
+
+  return  color;
+}
+String generateDateRangeString(String startDate) {
+  if (startDate.length != 8) {
+    throw FormatException('Date must be in yyyyMMdd format');
+  }
+
+  final year = int.parse(startDate.substring(0, 4));
+  final month = int.parse(startDate.substring(4, 6));
+  final day = int.parse(startDate.substring(6, 8));
+
+  final start = DateTime(year, month, day);
+  final now = DateTime.now();
+  final dates = <String>[];
+
+  if (start.isAfter(now)) {
+    return '';
+  }
+
+  DateTime current = start;
+
+  while (!current.isAfter(now)) {
+    final formatted =
+        '${current.year.toString().padLeft(4, '0')}'
+        '${current.month.toString().padLeft(2, '0')}'
+        '${current.day.toString().padLeft(2, '0')}';
+    dates.add(formatted);
+    current = current.add(const Duration(days: 1));
+  }
+
+  return dates.join(';');
 }

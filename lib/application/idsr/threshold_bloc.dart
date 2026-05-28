@@ -24,12 +24,12 @@ class ThresholdBloc extends Bloc<ThresholdEvent, ThresholdState> {
     on<LoadThreshold>((event, emit) async {
         filter=event.period;
         orgUnit=event.orgunit;
-        print("object heree 00");
+        // print("object heree 00");
       if(!Session.isLoggedIn){
-        print("object heree 11");
+        // print("object heree 11");
         return;}
 
-        print("object heree 22");
+        // print("object heree 22");
       emit(ThresholdLoading());
 
       try {

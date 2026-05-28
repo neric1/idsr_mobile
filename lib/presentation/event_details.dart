@@ -6,7 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:idsr/application/entity/events/comments_bloc.dart';
 import 'package:idsr/data/entity/models/tracked_entity.dart';
+import 'package:idsr/presentation/settings/about.dart';
 import 'package:idsr/presentation/widget/timeline.dart';
+import 'package:idsr/presentation/widget/utils_widget.dart';
 
 class EventDetails extends StatelessWidget {
   final String title;
@@ -28,6 +30,17 @@ class EventDetails extends StatelessWidget {
           title,
           style: TextStyle(fontSize: 20),
         ),
+        // actions: [
+        //   IconButton(
+        //     icon: const Icon(Icons.info_outline),
+        //     onPressed: () {
+        //       Navigator.push(
+        //         context,
+        //         MaterialPageRoute(builder: (_) => const AboutPage()),
+        //       );
+        //     },
+        //   ),
+        //   ]
       ),
       body: Column(
         children: [
@@ -187,7 +200,10 @@ class EventDetails extends StatelessWidget {
                                     }).toList(),
                                   ):Offstage();
                                 }
-                              )
+                              ),
+
+                              SizedBox(height: 10,),
+                              // sourceLink(),
                             ],
                           ),
                         ),

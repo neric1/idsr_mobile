@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:idsr/application/idsr/desease_comparison/disease_bloc.dart';
 import 'package:idsr/application/idsr/threshold_bloc.dart';
 import 'package:idsr/application/idsr/threshold_event.dart';
 import 'package:idsr/application/idsr/threshold_state.dart';
+import 'package:idsr/presentation/idsr/comparison_more_table.dart';
+import 'package:idsr/presentation/idsr/comparison_table.dart';
 import 'package:idsr/presentation/idsr/threshold_disease_country.dart';
 import 'package:idsr/presentation/idsr/threshold_disease_country_details_table.dart';
 import 'package:idsr/presentation/who_afro_dashboard.dart';
@@ -107,22 +110,7 @@ class IdsrDashboard extends StatelessWidget {
             child: Column(
               children: [
 
-                Container(
-                  margin: EdgeInsets.symmetric(horizontal: 16),
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                      color: const Color(0xff3498db),
-                    borderRadius: BorderRadius.circular(5),
-
-                  ),
-                  padding: const EdgeInsets.all(10),
-
-                  child: Text(
-                    "Disease Threshold Analysis",
-                    style: const TextStyle(color: Colors.white,fontSize: 18,fontWeight: FontWeight.w600),
-
-                  ),
-                ),
+              header("Disease Threshold Analysis"),
                 const SizedBox(height: 10),
                  Center(
                    child: BlinkingText(),
@@ -168,7 +156,70 @@ class IdsrDashboard extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
                 // DiseaseTrendChart(data:state.data),
-                // const SizedBox(height: 20),
+                header("Disease cases weekly comparison"),
+                const SizedBox(height: 10),
+                Builder(
+                  builder: (context) {
+                    final p=context.read<DiseaseBloc>();
+                    String per=p.period;
+
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("Current: ${per.split(";")[1]} • ${formatWeekRange(per.split(";")[0])}"),
+                        Text("Previous: ${per.split(";")[0]} • ${formatWeekRange(per.split(";")[1])}"),
+                      ],
+                    );
+                  }
+                ),
+                const SizedBox(height: 10),
+
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 6.0),
+                  child: ComparisonTable(),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) => const ComparisonMoreTable()),
+                            );
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 18),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: Colors.grey.shade300),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 6,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [
+                          Text(
+                            "View More Disease",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(width: 8),
+                          Icon(Icons.arrow_forward_ios, size: 16),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
 
                 //
                 // if (state.selectedDisease.isNotEmpty)
@@ -200,4 +251,53 @@ class IdsrDashboard extends StatelessWidget {
       },
     );
   }
+  Widget header(String title){
+    return   Container(
+      margin: EdgeInsets.symmetric(horizontal: 16),
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: const Color(0xff3498db),
+        borderRadius: BorderRadius.circular(5),
+
+      ),
+      padding: const EdgeInsets.all(10),
+
+      child: Text(title,
+        style: const TextStyle(color: Colors.white,fontSize: 18,fontWeight: FontWeight.w600),
+
+      ),
+    );
+  }
+}String formatWeekRange(String weekStr) {
+  final range = getWeekRange(weekStr);
+  final start = range['start']!;
+  final end = range['end']!;
+
+  return "${start.day} ${_month(start.month)} - ${end.day} ${_month(end.month)} ${end.year}";
+}
+
+String _month(int m) {
+  const months = [
+    "Jan","Feb","Mar","Apr","May","Jun",
+    "Jul","Aug","Sep","Oct","Nov","Dec"
+  ];
+  return months[m - 1];
+}
+DateTime _firstDayOfWeek(int year, int week) {
+  final jan4 = DateTime(year, 1, 4);
+  final jan4Weekday = jan4.weekday;
+
+  final firstMonday = jan4.subtract(Duration(days: jan4Weekday - 1));
+
+  return firstMonday.add(Duration(days: (week - 1) * 7));
+}
+
+Map<String, DateTime> getWeekRange(String weekStr) {
+  final year = int.parse(weekStr.substring(0, 4));
+  final week = int.parse(weekStr.substring(5));
+
+  final start = _firstDayOfWeek(year, week);
+  final end = start.add(const Duration(days: 6));
+
+  return {"start": start, "end": end};
 }

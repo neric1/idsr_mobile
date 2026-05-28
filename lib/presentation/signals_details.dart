@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:idsr/application/entity/events/comments_bloc.dart';
 import 'package:idsr/data/entity/models/tracked_entity.dart';
 import 'package:idsr/presentation/widget/timeline.dart';
+import 'package:idsr/presentation/widget/utils_widget.dart';
 
 class SignalsDetails extends StatefulWidget {
 
@@ -203,6 +204,8 @@ class _SignalsDetailsState extends State<SignalsDetails> {
                     ):Offstage();
                   }
               ),
+              // SizedBox(height: 10,),
+              // sourceLink(),
               SizedBox(height: 50,),
             ]),
         ))
