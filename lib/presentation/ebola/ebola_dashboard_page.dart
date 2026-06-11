@@ -253,6 +253,7 @@ class _EbolaDashboardPageState extends State<EbolaDashboardPage> with SingleTick
                         .where((t) => !explicitUgandaOuIds.contains(t.ou))
                         .toList();
                     final items = data.metaData['items'];
+                    final ouNameHierarchy = data.metaData['ouNameHierarchy'];
 
                     // ── Country grouping (Uganda vs DRC) ──────────────────
 
@@ -271,11 +272,20 @@ class _EbolaDashboardPageState extends State<EbolaDashboardPage> with SingleTick
                     //   'hoima',
                     // };
 
-                    bool isUgandaOu(String ouId) {
-                     return explicitUgandaOuIds.contains(ouId);
+                    // bool isUgandaOu(String ouId) {
+                    //  return explicitUgandaOuIds.contains(ouId);
                       // final ouName =
                       // (items[ouId]?['name']?.toString().toLowerCase() ?? '');
                       // return ugandaKeywords.any(ouName.contains);
+                    // }
+                    bool isUgandaOu(String id) {
+                      final location = ouNameHierarchy[id];
+
+                      if (location == null) {
+                        return false;
+                      }
+
+                      return location.startsWith('/Africa Region/Uganda/');
                     }
 
                     bool isUgandaRow(AnalyticsRow r) => isUgandaOu(r.ou);
@@ -499,21 +509,21 @@ class _EbolaDashboardPageState extends State<EbolaDashboardPage> with SingleTick
                                   country: "Democratic Republic of the Congo (DRC)",
                                   date: latestDateDRC,
                                   cards: [
-                                    _statData(
-                                      value: drcCumulSuspected,
-                                      label: "SUSPECTED\nCASES",
-                                      color: const Color(0xff747b8d),
-                                    ),
+                                    // _statData(
+                                    //   value: drcCumulSuspected,
+                                    //   label: "SUSPECTED\nCASES",
+                                    //   color: const Color(0xff747b8d),
+                                    // ),
                                     _statData(
                                       value: fmt(drcCumulConfirmed),
                                       label: "CONFIRMED\nCASES",
                                       color: const Color(0xff39b5e8),
                                     ),
-                                    _statData(
-                                      value: drcCumulSuspDead,
-                                      label: "SUSPECTED\nDEATHS",
-                                      color: const Color(0xffff770f),
-                                    ),
+                                    // _statData(
+                                    //   value: drcCumulSuspDead,
+                                    //   label: "SUSPECTED\nDEATHS",
+                                    //   color: const Color(0xffff770f),
+                                    // ),
                                     _statData(
                                       value: fmt(drcCumulConfDead),
                                       label: "CONFIRMED\nDEATHS",
@@ -532,27 +542,27 @@ class _EbolaDashboardPageState extends State<EbolaDashboardPage> with SingleTick
                                   ],
                                 ),
 
-                                const SizedBox(height: 28),
+                                const SizedBox(height: 20),
 
                                 _countrySection(
                                   country: "Uganda",
                                   date: latestDateUg,
                                   cards: [
-                                    _statData(
-                                      value: ugaCumulSuspected,
-                                      label: "SUSPECTED\nCASES",
-                                      color: const Color(0xff747b8d),
-                                    ),
+                                    // _statData(
+                                    //   value: ugaCumulSuspected,
+                                    //   label: "SUSPECTED\nCASES",
+                                    //   color: const Color(0xff747b8d),
+                                    // ),
                                     _statData(
                                       value: fmt(ugaCumulConfirmed),
                                       label: "CONFIRMED\nCASES",
                                       color: const Color(0xff39b5e8),
                                     ),
-                                    _statData(
-                                      value: ugaCumulSuspDead,
-                                      label: "SUSPECTED\nDEATHS",
-                                      color: const Color(0xffff770f),
-                                    ),
+                                    // _statData(
+                                    //   value: ugaCumulSuspDead,
+                                    //   label: "SUSPECTED\nDEATHS",
+                                    //   color: const Color(0xffff770f),
+                                    // ),
                                     _statData(
                                       value: fmt(ugaCumulConfDead),
                                       label: "CONFIRMED\nDEATHS",
@@ -611,7 +621,7 @@ class _EbolaDashboardPageState extends State<EbolaDashboardPage> with SingleTick
                                   ],
                                 ),
 
-                                const SizedBox(height: 28),
+                                const SizedBox(height: 20),
 
                                 _countrySection(
                                   isNew: true,
@@ -890,8 +900,8 @@ class ThreeItemGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        int columns = isNew?4:6;
-        const spacing = 2.0;
+        int columns = isNew?4:4;
+        const spacing =10.0;
 
         final itemWidth =
             (constraints.maxWidth - (spacing * (columns - 1))) / columns;
@@ -904,7 +914,7 @@ class ThreeItemGrid extends StatelessWidget {
             crossAxisCount: columns,
             crossAxisSpacing: isNew?20: spacing,
             mainAxisSpacing: isNew?40:spacing,
-            childAspectRatio: itemWidth / (itemWidth * 1.1),
+            childAspectRatio: 1.5,
           ),
           itemBuilder: itemBuilder,
         );

@@ -305,16 +305,16 @@ class ZoneCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           GridView.count(
-            crossAxisCount: 5,
+            crossAxisCount: 3,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             crossAxisSpacing: 10,
             mainAxisSpacing: 10,
-            childAspectRatio: 1.0,
+            childAspectRatio: 1.5,
             children: [
-              StatTile(label: 'Suspected cases', value: '${zone.suspected}'),
+              // StatTile(label: 'Suspected cases', value: '${zone.suspected}'),
               StatTile(label: 'Confirmed cases', value: '${zone.confirmed}'),
-              StatTile(label: 'Suspected deaths', value: '${zone.suspectedDeaths}'),
+              // StatTile(label: 'Suspected deaths', value: '${zone.suspectedDeaths}'),
               StatTile(label: 'Confirmed deaths', value: '${zone.confirmedDeaths}'),
               StatTile(label: 'CFR %', value: zone.cfr),
             ],
@@ -359,7 +359,7 @@ class StatTile extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(
-              fontSize: 15,
+              fontSize: 17,
               fontWeight: FontWeight.w800,
               color: Color(0xFF1E2A3A),
             ),
@@ -368,7 +368,7 @@ class StatTile extends StatelessWidget {
             label,
             textAlign: TextAlign.center,
             style: const TextStyle(
-              fontSize: 8,
+              fontSize: 11,
               height: 1.2,
               fontWeight: FontWeight.w600,
               color: Color(0xFF6A7483),
