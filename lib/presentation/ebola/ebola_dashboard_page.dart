@@ -285,7 +285,7 @@ class _EbolaDashboardPageState extends State<EbolaDashboardPage> with SingleTick
                         return false;
                       }
 
-                      return location.startsWith('/Africa Region/Uganda/');
+                      return location.startsWith('/Africa Region/Uganda/') ||location.startsWith('/Uganda/');
                     }
 
                     bool isUgandaRow(AnalyticsRow r) => isUgandaOu(r.ou);
@@ -309,9 +309,8 @@ class _EbolaDashboardPageState extends State<EbolaDashboardPage> with SingleTick
                       String? period,
                     }) => analyticsRows
                         .where(
-                          (r) =>
-                      isUgandaRow(r) == uganda &&
-                          (period == null || r.pe == period),
+                          (r) => isUgandaRow(r) == uganda &&
+                          (period == null || r.pe == period) && r.value>0 &&( r.dx== "OoZOXclQI7l" ||r.dx== "E9dLxqaEL3g" ) && items[r.ou]["name"]!="Unknown",
                     )
                         .map((r) => r.ou)
                         .toSet()

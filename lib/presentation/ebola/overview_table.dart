@@ -95,7 +95,7 @@ List<ProvinceData> buildOutbreakData(ThresholdModel dataResponse) {
         : (ouHierarchy[ouId]?.split('/').where((p) => p.isNotEmpty).toList() ?? const []);
 
     // final country = parts.isNotEmpty ? _countryAbbr(parts.first) : 'Unknown';
-    final country = parts.isNotEmpty && parts.length>1? _countryAbbr(parts[1]) : 'Unknown';
+    final country =  parts.length>=3? _countryAbbr(parts[parts.length - 3]) : 'Unknown';
     final province = parts.length >= 2 ? parts[parts.length - 2] : 'Unknown';
     final zoneName = (items[ouId] as Map?)?['name']?.toString() ??
         (parts.isNotEmpty ? parts.last : ouId);
@@ -104,6 +104,7 @@ List<ProvinceData> buildOutbreakData(ThresholdModel dataResponse) {
     final confirmed = getValue(ouId, _dxConfirmedCases).round();
     final suspectedDeaths = getValue(ouId, _dxSuspectedDeaths).round();
     final confirmedDeaths = getValue(ouId, _dxConfirmedDeaths).round();
+    if(confirmed == 0 && confirmedDeaths == 0) continue;
     final cfr =
     confirmed == 0 ? '0' : ((confirmedDeaths / confirmed) * 100).toStringAsFixed(1);
     final latestDate = _formatPeriodDate(latestPeriodByOu[ouId] ?? '');
@@ -380,107 +381,7 @@ class StatTile extends StatelessWidget {
   }
 }
 
-// class TotalSummaryCard extends StatelessWidget {
-//   final int suspected;
-//   final int confirmed;
-//   final int suspectedDeaths;
-//   final int confirmedDeaths;
-//   final String cfr;
-//
-//   const TotalSummaryCard({
-//     super.key,
-//     required this.suspected,
-//     required this.confirmed,
-//     required this.suspectedDeaths,
-//     required this.confirmedDeaths,
-//     required this.cfr,
-//   });
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container(
-//       padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
-//       decoration: BoxDecoration(
-//         color: const Color(0xFF2C469A),
-//         borderRadius: BorderRadius.circular(7),
-//       ),
-//       child: Column(
-//         crossAxisAlignment: CrossAxisAlignment.start,
-//         children: [
-//           const Text(
-//             'Total',
-//             style: TextStyle(
-//               color: Colors.white,
-//               fontSize: 18,
-//               fontWeight: FontWeight.w800,
-//             ),
-//           ),
-//           const SizedBox(height: 7),
-//           GridView.count(
-//             crossAxisCount: 5,
-//             shrinkWrap: true,
-//             physics: const NeverScrollableScrollPhysics(),
-//             crossAxisSpacing: 5,
-//             mainAxisSpacing: 5,
-//             childAspectRatio: 1.0,
-//             children: [
-//               TotalTile(label: 'Suspected cases', value: '$suspected'),
-//               TotalTile(label: 'Confirmed cases', value: '$confirmed'),
-//               TotalTile(label: 'Suspected deaths', value: '$suspectedDeaths'),
-//               TotalTile(label: 'Confirmed deaths', value: '$confirmedDeaths'),
-//               TotalTile(label: 'CFR %', value: cfr),
-//             ],
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
 
-// class TotalTile extends StatelessWidget {
-//   final String label;
-//   final String value;
-//
-//   const TotalTile({
-//     super.key,
-//     required this.label,
-//     required this.value,
-//   });
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container(
-//       decoration: BoxDecoration(
-//         color: Colors.white.withOpacity(.12),
-//         borderRadius: BorderRadius.circular(7),
-//       ),
-//       padding: const EdgeInsets.all(10),
-//       child: Column(
-//         mainAxisAlignment: MainAxisAlignment.center,
-//         children: [
-//           Text(
-//             value,
-//             style: const TextStyle(
-//               color: Colors.white,
-//               fontSize: 16,
-//               fontWeight: FontWeight.w800,
-//             ),
-//           ),
-//           const SizedBox(height: 3),
-//           Text(
-//             label,
-//             textAlign: TextAlign.center,
-//             style: const TextStyle(
-//               color: Colors.white70,
-//               fontSize: 10,
-//               fontWeight: FontWeight.w600,
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
 
 class ProvinceData {
   final String name;
