@@ -7,6 +7,8 @@ import 'package:idsr/data/entity/models/tracked_entity.dart';
 import 'package:idsr/presentation/map_legend.dart';
 import 'package:idsr/utils/utils.dart';
 import 'package:latlong2/latlong.dart';
+const _oceanColor = Color(0xFFD6DFE6);
+const _landColor = Color(0xFFF2F2F2);
 const  removedCountry=[ "morocco","libya", "tunisia", "sudan", "egypt", "djibouti", "somalia","somaliland","w sahara"];
 class MyMapWidget extends StatefulWidget {
   List<TrackedEntity> trackedEntity;
@@ -20,6 +22,7 @@ class _MyMapWidgetState extends State<MyMapWidget> {
   final MapController _mapController = MapController();
   List<Polygon> polygons = [];
   List<Marker> markers = [];
+  List<({String name, LatLng point, double minZoom})> labels = [];
   Map<String, int> counts = {};
   @override
   void dispose() {
@@ -38,20 +41,14 @@ class _MyMapWidgetState extends State<MyMapWidget> {
   counts=getTrackedEntity(widget.trackedEntity);
 
   _loadGeoJson();
+    super.initState();
+  }
 
-  polygonHitNotifier.addListener(() {
+  void _onMapTap() {
     final result = polygonHitNotifier.value;
     if (result == null || result.hitValues.isEmpty) return;
-
-    for (final hit in result.hitValues) {
-      if (hit is Polygon) {
-        // You found the tapped polygon
-        _showTooltip(context, hit.label?.toString() ?? 'Country');
-        break;
-      }
-    }
-  });
-    super.initState();
+    final hit = result.hitValues.first as ({String name, int count});
+    _showTooltip(context, hit.name, '${hit.count} ongoing events');
   }
 
   getTrackedEntity(List<TrackedEntity> trackedEntity){
@@ -113,21 +110,25 @@ class _MyMapWidgetState extends State<MyMapWidget> {
   void _addPolygon(
       List ring,
       String countryName,
+      String displayName,
       List<Polygon> polygons,
       List<Marker> markers,
       ) {
     final points = geoJsonRingToLatLng(ring);
 
     final int count = counts[countryName] ?? 0;
+    final bool isRemoved = removedCountry.contains(countryName);
 
-    final fillColor = removedCountry.contains(countryName)?Color(0xFFF2EFE9 ) :colorForCount(count);
+    final fillColor = isRemoved?Color(0xFFF2EFE9 ) :colorForCount(count);
 
     polygons.add(
       Polygon(
         points: points,
-        color: fillColor.withOpacity(0.6),
+        // Blend onto a land colour so fills look the same without a basemap.
+        color: Color.alphaBlend(fillColor.withOpacity(0.6), _landColor),
         borderColor: Colors.blueGrey,
         borderStrokeWidth: 1,
+        hitValue: isRemoved ? null : (name: displayName, count: count),
       ),
     );
 
@@ -168,10 +169,19 @@ class _MyMapWidgetState extends State<MyMapWidget> {
 
     final List<Polygon> tempPolygons = [];
     final List<Marker> tempMarkers = [];
+    final List<({String name, LatLng point, double minZoom})> tempLabels = [];
 
     for (final feature in jsonData['features']) {
-      final rawName = feature['properties']['name'];
+      final properties = feature['properties'];
+      final rawName = properties['name'];
       final name = normalizeCountryName(rawName);
+
+      // Natural Earth ships a label anchor and the zoom at which to show it.
+      tempLabels.add((
+        name: rawName,
+        point: LatLng((properties['label_y'] as num).toDouble(), (properties['label_x'] as num).toDouble()),
+        minZoom: (properties['min_label'] as num).toDouble(),
+      ));
 
 
 
@@ -179,13 +189,13 @@ class _MyMapWidgetState extends State<MyMapWidget> {
 
       if (geometry['type'] == 'Polygon') {
         final ring = geometry['coordinates'][0];
-        _addPolygon(ring, name, tempPolygons, tempMarkers);
+        _addPolygon(ring, name, rawName, tempPolygons, tempMarkers);
       }
 
       if (geometry['type'] == 'MultiPolygon') {
         for (final poly in geometry['coordinates']) {
           final ring = poly[0];
-          _addPolygon(ring, name, tempPolygons, tempMarkers);
+          _addPolygon(ring, name, rawName, tempPolygons, tempMarkers);
         }
       }
     }
@@ -193,7 +203,52 @@ class _MyMapWidgetState extends State<MyMapWidget> {
     setState(() {
       polygons = tempPolygons;
       markers = tempMarkers;
+      labels = tempLabels..sort((a, b) => a.minZoom.compareTo(b.minZoom));
     });
+  }
+
+  Widget _buildCountryLabels(BuildContext context) {
+    final camera = MapCamera.of(context);
+    // Labels are sorted by importance; skip any that would overlap one already placed.
+    final placed = <Rect>[];
+    final visible = labels.where((label) {
+      if (label.minZoom > camera.zoom + 0.5) return false;
+      final p = camera.latLngToScreenPoint(label.point);
+      final rect = Rect.fromCenter(
+        center: Offset(p.x, p.y),
+        width: label.name.length * 5.5 + 4,
+        height: 12,
+      );
+      if (placed.any(rect.overlaps)) return false;
+      placed.add(rect);
+      return true;
+    }).toList();
+    return MarkerLayer(
+      markers: [
+        for (final label in visible)
+          Marker(
+            point: label.point,
+            width: 100,
+            height: 12,
+            child: IgnorePointer(
+              child: Text(
+                label.name.toUpperCase(),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                softWrap: false,
+                overflow: TextOverflow.visible,
+                style: const TextStyle(
+                  fontSize: 7,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.5,
+                  color: Colors.black54,
+                  shadows: [Shadow(color: Colors.white70, blurRadius: 2)],
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
   }
 
   // Future<void> _loadGeoJson() async {
@@ -267,26 +322,24 @@ class _MyMapWidgetState extends State<MyMapWidget> {
             options: MapOptions(
               initialCenter: LatLng(0, 16),
               initialZoom: 2.6,
-              backgroundColor: Colors.black,
+              backgroundColor: _oceanColor,
     interactionOptions: const InteractionOptions(
     flags: InteractiveFlag.none,
     ),
             ),
             children: [
-              TileLayer(
-                urlTemplate: 'https://basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
-                //'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                // tileBuilder: themeProvider.themeMode == ThemeMode.dark
-                //     ? darkModeTileBuilder
-                //     : null,
-                userAgentPackageName: 'com.afro.idsr', // ensure set
-              ),
-
+              // No basemap tiles: the GeoJSON polygons and labels below are
+              // the whole map, so it has no third-party tile dependency.
               if (polygons.isNotEmpty)
-                PolygonLayer(
-                  hitNotifier: polygonHitNotifier,
-                  polygons: polygons,
+                GestureDetector(
+                  onTap: _onMapTap,
+                  child: PolygonLayer(
+                    hitNotifier: polygonHitNotifier,
+                    polygons: polygons,
+                  ),
                 ),
+              if (labels.isNotEmpty)
+                Builder(builder: _buildCountryLabels),
               if (markers.isNotEmpty)
                 MarkerLayer(markers: markers),
               // MarkerLayer(
@@ -339,12 +392,12 @@ class _MyMapWidgetState extends State<MyMapWidget> {
     );
   }
 }
-void _showTooltip(BuildContext context, String country) {
+void _showTooltip(BuildContext context, String country, String details) {
   showDialog(
     context: context,
     builder: (_) => AlertDialog(
       title: Text(country),
-      content: Text('Country selected'),
+      content: Text(details),
     ),
   );
 }
