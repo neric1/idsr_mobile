@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:idsr/application/ebola/ebola_bloc.dart';
 import 'package:idsr/application/ebola/ebola_event.dart';
 import 'package:idsr/application/ebola/ebola_state.dart';
+import 'package:idsr/presentation/ebola/last_day_new_cases.dart';
 import 'package:idsr/presentation/ebola/overview_table.dart';
 import 'package:idsr/utils/constant.dart';
 import 'package:idsr/utils/utils.dart';
@@ -684,6 +685,7 @@ class _EbolaDashboardPageState extends State<EbolaDashboardPage> with SingleTick
                 }
             ),
             SizedBox(height: 15,),
+            const LastDayNewCasesSection(),
             OutbreakOverviewPage()
           ],
         ),
